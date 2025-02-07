@@ -1,6 +1,6 @@
 package com.sigmadevs.testtask.security.service;
 
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.security.config.JwtUtil;
 import com.sigmadevs.testtask.security.dto.UserGetDto;
 import com.sigmadevs.testtask.security.dto.UserLoginDto;
@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +44,8 @@ public class AuthService {
         return ResponseEntity.ok(userMapper.userToUserGetDto(user));
     }
 
-    public ResponseEntity<UserGetDto> registration(UserRegistrationDto userRegistrationDto) {
-        User user = userService.save(userMapper.userRegistrationDtoToUser(userRegistrationDto));
-        System.out.println(user);
+    public ResponseEntity<UserGetDto> registration(UserRegistrationDto userRegistrationDto, MultipartFile image) {
+        User user = userService.save(userMapper.userRegistrationDtoToUser(userRegistrationDto), image);
         return ResponseEntity.ok(userMapper.userToUserGetDto(user));
     }
 

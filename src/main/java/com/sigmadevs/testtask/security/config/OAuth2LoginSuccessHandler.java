@@ -3,9 +3,8 @@ package com.sigmadevs.testtask.security.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.security.entity.Role;
-import com.sigmadevs.testtask.security.entity.SignUpMethod;
 import com.sigmadevs.testtask.security.service.AuthService;
 import com.sigmadevs.testtask.security.service.UserService;
 import jakarta.servlet.ServletException;
@@ -85,7 +84,6 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                         newUser.setRole(Role.USER);
                         newUser.setEmail(email);
                         newUser.setUsername(username);
-                        newUser.setSignUpMethod(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId().equals("github") ? SignUpMethod.github : SignUpMethod.google);
                         userService.save(newUser);
                         DefaultOAuth2User oauthUser = new DefaultOAuth2User(
                                 Collections.singleton(newUser.getRole()),

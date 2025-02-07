@@ -1,6 +1,6 @@
 package com.sigmadevs.testtask.security.repository;
 
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

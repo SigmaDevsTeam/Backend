@@ -1,6 +1,6 @@
 package com.sigmadevs.testtask.security.config;
 
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.security.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

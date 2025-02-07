@@ -1,6 +1,6 @@
 package com.sigmadevs.testtask.security.config;
 
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,19 +1,17 @@
-package com.sigmadevs.testtask.app;
+package com.sigmadevs.testtask.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sigmadevs.testtask.security.entity.Role;
-import com.sigmadevs.testtask.security.entity.SignUpMethod;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import com.sigmadevs.testtask.security.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -35,17 +33,22 @@ public class User implements UserDetails {
     @ToString.Exclude
     @JsonIgnore
     private String password;
-    @Column(nullable = false)
+    @NotNull
     private String image;
     @NotNull
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
-    @NotNull
-    @Builder.Default
-    @Column(name = "sign_up_method")
-    @Enumerated(value = EnumType.STRING)
-    private SignUpMethod signUpMethod = SignUpMethod.form;
+    private Integer usersRated;
+    private Float rating;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Quest> quests;
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Comment> comments;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

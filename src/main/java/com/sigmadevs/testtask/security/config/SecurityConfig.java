@@ -50,7 +50,7 @@ public class SecurityConfig {
                         loginPage("/oauth2/authorization/google")
                         .successHandler(oAuth2LoginSuccessHandler)).
                 authorizeHttpRequests(request ->
-                        request.requestMatchers("/", "/logout", "/login", "/registration", "/static/**", "/home").permitAll().
+                        request.requestMatchers("/","/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home").permitAll().
                                 requestMatchers("/admin/**").hasAuthority(Role.ADMIN.getAuthority()).
                                 anyRequest().authenticated()).
                 logout(e -> e

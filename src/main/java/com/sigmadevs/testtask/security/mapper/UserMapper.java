@@ -1,6 +1,6 @@
 package com.sigmadevs.testtask.security.mapper;
 
-import com.sigmadevs.testtask.app.User;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.security.dto.UserGetDto;
 import com.sigmadevs.testtask.security.dto.UserRegistrationDto;
 import org.mapstruct.Mapper;
