@@ -37,16 +37,6 @@ public class AuthController {
     public ResponseEntity<UserGetDto> getCurrentAccount(Principal principal) {
         return ResponseEntity.ok(userMapper.userToUserGetDto(userService.findByUsername(principal.getName())));
     }
-    //test
-    @GetMapping("/home")
-    public String getHome() {
-        return "home";
-    }
-    //test
-    @GetMapping("/profile")
-    public String getProfile(Principal principal) {
-        return principal.getName();
-    }
 }
 
 

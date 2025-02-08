@@ -1,8 +1,11 @@
 package com.sigmadevs.testtask.security.service;
 
 import com.sigmadevs.testtask.app.entity.User;
+import com.sigmadevs.testtask.security.dto.UserGetDto;
+import com.sigmadevs.testtask.security.dto.UserUpdateDto;
 import com.sigmadevs.testtask.security.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.exception.UsernameAlreadyExistsException;
+import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final ServerProperties serverProperties;
+    private final UserMapper userMapper;
 
     //get
 
@@ -121,8 +125,11 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User update(@NotNull User newUser) {
-        return userRepository.save(newUser);
+    public UserGetDto updateImage(@NotNull MultipartFile image, String username) {
+        User user = findByUsername(username);
+        String newUrl = imageService.updateImage(user.getImage(),image);
+        user.setImage(newUrl);
+        return userMapper.userToUserGetDto(userRepository.save(user));
     }
 //    public User update(@NotNull UserUpdateDto userUpdateDto) {
 //

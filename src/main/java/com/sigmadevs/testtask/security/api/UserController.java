@@ -1,12 +1,14 @@
 package com.sigmadevs.testtask.security.api;
 
+import com.sigmadevs.testtask.security.dto.UserGetDto;
+import com.sigmadevs.testtask.security.dto.UserUpdateDto;
 import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -26,10 +28,10 @@ public class UserController {
         }
     }
 
-//    @PatchMapping("/update")
-//    public ResponseEntity<UserGetDto> updateAccount(Principal principal, @RequestBody UserUpdateDto userUpdateDto) {
-//        return userMapper.userToUserGetDto(userService.update(userUpdateDto));
-//    }
+    @PatchMapping(value = "/updateImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserGetDto> updateImage(Principal principal, @RequestPart("image") MultipartFile image) {
+        return ResponseEntity.ok(userService.updateImage(image,principal.getName()));
+    }
 
 
 }
