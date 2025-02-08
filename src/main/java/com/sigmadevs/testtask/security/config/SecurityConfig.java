@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
                             response.getWriter().write("Logged out successfully");
-                            response.sendRedirect(redirectUrlLogout);
+//                            response.sendRedirect(redirectUrlLogout);
                         })
                 ).
                 userDetailsService(userService).

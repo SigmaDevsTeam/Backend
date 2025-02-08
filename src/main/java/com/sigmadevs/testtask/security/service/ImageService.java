@@ -12,8 +12,11 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,14 +38,22 @@ public class ImageService {
         return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(url)).toString();
     }
     public boolean deleteImage(String url){
-        String newUrl = Arrays.stream(url.split("/")).skip(2).toString();
-        System.out.println(newUrl);
-//        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(newUrl).build());
-        return true;
+        String newUrl = Arrays.stream(url.split("/")).skip(3).reduce((e1,e2)->e1+"/"+e2).orElseThrow();//TODO
+        try{
+            log.debug(newUrl);
+            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(newUrl).build());
+            return true;
+        }catch (Exception e){
+            log.debug(e.getMessage());
+            return false;
+        }
     }
 
     public String updateImage(@NotNull String image, @NotNull MultipartFile file) {
+        List<String> list = Arrays.stream(image.split("/")).skip(3).collect(Collectors.toCollection(ArrayList::new));
+        list.removeLast();
+        String folders = list.stream().reduce((e1, e2) -> e1 + "/" + e2).orElseThrow();//TODO
         deleteImage(image);
-        return null;
+        return uploadImage(folders, file);
     }
 }

@@ -1,6 +1,7 @@
 package com.sigmadevs.testtask.security.config;
 
 import com.sigmadevs.testtask.app.entity.User;
+import com.sigmadevs.testtask.security.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,7 +35,16 @@ public class JwtCookieFilter extends OncePerRequestFilter {
         if (cookie != null) {
             String jwtToken = Optional.ofNullable(cookie.getValue()).orElse("");
             if (!jwtToken.isBlank() && jwtUtil.validateToken(jwtToken)) {
-                User user = userService.findByUsername(jwtUtil.getUsername(jwtToken));
+                User user;
+                try {
+
+                    user = userService.findByUsername(jwtUtil.getUsername(jwtToken));
+                } catch (UserNotFoundException e) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setHeader("Set-Cookie", "accessToken=unauthorized;expires=Thu, 01 Jan 1970 00:00:01 GMT;");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
                 if (user != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(new Principal() {
                         @Override

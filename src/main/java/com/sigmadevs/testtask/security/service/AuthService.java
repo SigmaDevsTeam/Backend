@@ -36,17 +36,23 @@ public class AuthService {
             throw new RuntimeException("User not found");
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),userLoginDto.getPassword()));
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes())
-                .getResponse();
-        Cookie cookie = createCookie(jwtUtil.generateToken(user));
-        response.addCookie(cookie);
+        setCookie(user);
         return ResponseEntity.ok(userMapper.userToUserGetDto(user));
     }
 
     public ResponseEntity<UserGetDto> registration(UserRegistrationDto userRegistrationDto, MultipartFile image) {
         User user = userService.save(userMapper.userRegistrationDtoToUser(userRegistrationDto), image);
+        setCookie(user);
         return ResponseEntity.ok(userMapper.userToUserGetDto(user));
+    }
+
+
+    private void setCookie(User user) {
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes())
+                .getResponse();
+        Cookie cookie = createCookie(jwtUtil.generateToken(user));
+        response.addCookie(cookie);
     }
 
     public Cookie createCookie(String jwt) {

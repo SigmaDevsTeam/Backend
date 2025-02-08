@@ -1,7 +1,6 @@
 package com.sigmadevs.testtask.security.api;
 
 import com.sigmadevs.testtask.security.dto.UserGetDto;
-import com.sigmadevs.testtask.security.dto.UserUpdateDto;
 import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,12 @@ public class UserController {
 
     @PatchMapping(value = "/updateImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserGetDto> updateImage(Principal principal, @RequestPart("image") MultipartFile image) {
-        return ResponseEntity.ok(userService.updateImage(image,principal.getName()));
+        return ResponseEntity.ok(userService.updateImage(image,principal));
+    }
+    @PatchMapping(value = "/updatePassword")
+    public ResponseEntity<UserGetDto> updatePassword(Principal principal, @RequestBody String password) {
+        System.out.println(password);
+        return ResponseEntity.ok(userService.updatePassword(principal,password));
     }
 
 
