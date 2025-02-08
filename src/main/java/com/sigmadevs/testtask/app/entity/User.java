@@ -26,25 +26,35 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+
+    @Column(nullable = false)
     private String email;
-    @NotBlank
+
+    @Column(nullable = false)
     private String username;
+
     @ToString.Exclude
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
-    @NotNull
+
+    @Column(nullable = false)
     private String image;
-    @NotNull
+
+    @Column(nullable = false)
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
+
     private Integer usersRated;
+
     private Float rating;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
     private List<Quest> quests;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     @ToString.Exclude

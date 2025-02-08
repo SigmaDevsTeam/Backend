@@ -16,8 +16,8 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank
+
+    @Column(nullable = false)
     private String title;
     private String audio;
     private String video;

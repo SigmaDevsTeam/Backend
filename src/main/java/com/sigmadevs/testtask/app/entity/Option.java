@@ -1,25 +1,23 @@
 package com.sigmadevs.testtask.app.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
-@Table(name = "option")
-@Data
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Table(name = "option")
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank
+
     private String title;
-    
-    @NotNull
+
+    @Column(nullable = false)
     private Boolean isTrue;
     
     @ManyToOne
