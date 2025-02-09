@@ -10,14 +10,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class OptionDTO {
+public class UpdateCommentDTO {
 
+    @NotNull(message = "Field should contains Id!")
     private Long id;
 
+    @NotBlank(message = "Field should contains title!")
     private String title;
-
-    private Boolean isTrue;
-
-    private TaskDTO taskDTO;
 
 }

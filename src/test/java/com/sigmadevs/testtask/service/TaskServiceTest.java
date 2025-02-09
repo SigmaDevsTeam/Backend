@@ -1,11 +1,16 @@
 package com.sigmadevs.testtask.service;
 
+import com.sigmadevs.testtask.app.dto.CreateTaskDTO;
 import com.sigmadevs.testtask.app.dto.OptionDTO;
 import com.sigmadevs.testtask.app.dto.TaskDTO;
+import com.sigmadevs.testtask.app.dto.UpdateTaskDTO;
 import com.sigmadevs.testtask.app.entity.Option;
+import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.Task;
+import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.exception.TaskNotFoundException;
 import com.sigmadevs.testtask.app.mapper.TaskMapper;
+import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.repository.TaskRepository;
 import com.sigmadevs.testtask.app.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,14 +34,27 @@ public class TaskServiceTest {
     @Mock
     TaskRepository taskRepository;
     @Mock
+    QuestRepository questRepository;
+    @Mock
     TaskMapper taskMapper;
     Task task;
     TaskDTO taskDTO;
-
+    CreateTaskDTO createTaskDTO;
+    UpdateTaskDTO updateTaskDTO;
     @BeforeEach
     void setUp() {
 
         taskDTO = TaskDTO.builder()
+                .title("Test title")
+                .build();
+
+        createTaskDTO = CreateTaskDTO.builder()
+                .title("Test title")
+                .questId(1L)
+                .build();
+
+        updateTaskDTO = UpdateTaskDTO.builder()
+                .id(1L)
                 .title("Test title")
                 .build();
 
@@ -45,12 +63,13 @@ public class TaskServiceTest {
                 .build();
 
     }
-
-
     @Test
     void createTask_shouldReturnTaskDTO() {
 
-        when(taskMapper.toEntity(any(TaskDTO.class)))
+        when(questRepository.findById(createTaskDTO.getQuestId()))
+                .thenReturn(Optional.of(new Quest()));
+
+        when(taskMapper.toEntity(any(CreateTaskDTO.class), any(Quest.class)))
                 .thenReturn(task);
 
         when(taskRepository.save(any(Task.class)))
@@ -59,14 +78,63 @@ public class TaskServiceTest {
         when(taskMapper.toDTO(any(Task.class)))
                 .thenReturn(taskDTO);
 
-        TaskDTO actualTaskDTO = taskService.createTask(taskDTO);
+        TaskDTO actualTaskDTO = taskService.createTask(createTaskDTO);
 
         assertNotNull(actualTaskDTO);
         assertEquals(actualTaskDTO, taskDTO);
 
-        verify(taskMapper).toEntity(any(TaskDTO.class));
+        verify(questRepository).findById(createTaskDTO.getQuestId());
+        verify(taskMapper).toEntity(any(CreateTaskDTO.class), any(Quest.class));
         verify(taskRepository).save(any(Task.class));
         verify(taskMapper).toDTO(any(Task.class));
+    }
+
+    @Test
+    void createTask_shouldThrowException_whenQuestNotFound() {
+
+        when(questRepository.findById(createTaskDTO.getQuestId()))
+                .thenReturn(Optional.empty());
+
+        QuestNotFoundException exception = assertThrows(QuestNotFoundException.class, () -> taskService.createTask(createTaskDTO));
+
+        assertEquals("Quest with Id " + createTaskDTO.getQuestId() + " not found!", exception.getMessage());
+
+        verify(questRepository).findById(createTaskDTO.getQuestId());
+        verify(taskMapper, never()).toEntity(any(CreateTaskDTO.class), any(Quest.class));
+        verify(taskRepository, never()).save(any(Task.class));
+        verify(taskMapper, never()).toDTO(any(Task.class));
+    }
+
+    @Test
+    void updateTask_shouldReturnTaskDTO() {
+
+        when(taskRepository.findById(updateTaskDTO.getId()))
+                .thenReturn(Optional.of(task));
+
+        when(taskMapper.toDTO(any(Task.class)))
+                .thenReturn(taskDTO);
+
+        TaskDTO actualTaskDTO = taskService.updateTask(updateTaskDTO);
+
+        assertNotNull(actualTaskDTO);
+        assertEquals(actualTaskDTO, taskDTO);
+
+        verify(taskRepository).findById(updateTaskDTO.getId());
+        verify(taskMapper).toDTO(any(Task.class));
+    }
+
+    @Test
+    void updateTask_shouldThrowException_whenTaskNotFound() {
+
+        when(taskRepository.findById(updateTaskDTO.getId()))
+                .thenReturn(Optional.empty());
+
+        TaskNotFoundException exception = assertThrows(TaskNotFoundException.class, () -> taskService.updateTask(updateTaskDTO));
+
+        assertEquals("Task with Id " + updateTaskDTO.getId() + " not found!", exception.getMessage());
+
+        verify(taskRepository).findById(updateTaskDTO.getId());
+        verify(taskMapper,never()).toDTO(any(Task.class));
     }
 
     @Test
@@ -86,40 +154,6 @@ public class TaskServiceTest {
 
         verify(taskRepository).findAll();
         verify(taskMapper).toDTOList(any(List.class));
-    }
-
-    @Test
-    void updateTask_shouldReturnTaskDTO() {
-
-        taskDTO.setTitle("Test title 2");
-
-        when(taskRepository.findById(taskDTO.getId()))
-                .thenReturn(Optional.of(task));
-
-        when(taskMapper.toDTO(any(Task.class)))
-                .thenReturn(taskDTO);
-
-        TaskDTO actualTaskDTO = taskService.updateTask(taskDTO);
-
-        assertNotNull(actualTaskDTO);
-        assertEquals(actualTaskDTO, taskDTO);
-
-        verify(taskRepository).findById(taskDTO.getId());
-        verify(taskMapper).toDTO(any(Task.class));
-    }
-
-    @Test
-    void updateTask_shouldThrowException_whenTaskNotFound() {
-
-        when(taskRepository.findById(taskDTO.getId()))
-                .thenReturn(Optional.empty());
-
-        TaskNotFoundException exception = assertThrows(TaskNotFoundException.class, () -> taskService.updateTask(taskDTO));
-
-        assertEquals("Task with Id " + taskDTO.getId() + " not found!", exception.getMessage());
-
-        verify(taskRepository).findById(taskDTO.getId());
-        verify(taskMapper,never()).toDTO(any(Task.class));
     }
 
     @Test

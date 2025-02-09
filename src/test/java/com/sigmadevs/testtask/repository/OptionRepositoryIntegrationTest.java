@@ -107,12 +107,31 @@ public class OptionRepositoryIntegrationTest {
         Optional<Option> optionalOption = optionRepository.findById(id);
         assertTrue(optionalOption.isEmpty());
     }
-
+    @ParameterizedTest
+    @ValueSource(longs = {1L,2L,3L,4L,5L,6L,7L,8L,9L,10L})
+    void existsById_shouldReturnTrue(long id) {
+        boolean isOptionExists = optionRepository.existsById(id);
+        assertTrue(isOptionExists);
+    }
+    @Test
+    void existsById_shouldReturnFalse_whenOptionNotFound() {
+        long id = 100L;
+        boolean isOptionExists = optionRepository.existsById(id);
+        assertFalse(isOptionExists);
+    }
     @ParameterizedTest
     @ValueSource(longs = {1L,2L,3L,4L,5L,6L,7L,8L,9L,10L})
     void deleteById_shouldRemoveOption(long id) {
         optionRepository.deleteById(id);
         assertEquals(9, optionRepository.count());
+        assertEquals(5, taskRepository.count());
+    }
+
+    @Test
+    void deleteById_shouldNotRemoveOption_whenOptionNotFound() {
+        long id = 100L;
+        optionRepository.deleteById(id);
+        assertEquals(10, optionRepository.count());
         assertEquals(5, taskRepository.count());
     }
 

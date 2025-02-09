@@ -1,5 +1,8 @@
 spring:
 
+  jpa:
+    generate-ddl: true
+
   servlet:
     multipart:
       enabled: true

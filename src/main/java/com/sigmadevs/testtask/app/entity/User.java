@@ -55,7 +55,7 @@ public class User implements UserDetails {
     @ToString.Exclude
     private List<Quest> quests;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
     private List<Comment> comments;

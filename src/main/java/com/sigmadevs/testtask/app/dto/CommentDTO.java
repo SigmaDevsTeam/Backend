@@ -12,7 +12,6 @@ public class CommentDTO {
 
     private Long id;
 
-    @NotBlank(message = "Comment can not be blank!")
     private String title;
 
     private UserDTO userDTO;

@@ -1,6 +1,8 @@
 package com.sigmadevs.testtask.app.rest;
 
+import com.sigmadevs.testtask.app.dto.CreateOptionDTO;
 import com.sigmadevs.testtask.app.dto.OptionDTO;
+import com.sigmadevs.testtask.app.dto.UpdateOptionDTO;
 import com.sigmadevs.testtask.app.service.OptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,13 @@ public class OptionRestController {
     private final OptionService optionService;
     @PostMapping("/options")
     @ResponseStatus(HttpStatus.CREATED)
-    public OptionDTO createOption(@RequestBody @Valid OptionDTO optionDTO) {
-        return optionService.createOption(optionDTO);
+    public OptionDTO createOption(@RequestBody @Valid CreateOptionDTO createOptionDTO) {
+        return optionService.createOption(createOptionDTO);
     }
     @PutMapping("/options")
     @ResponseStatus(HttpStatus.OK)
-    public OptionDTO updateOption(@RequestBody @Valid OptionDTO optionDTO) {
-        return optionService.updateOption(optionDTO);
+    public OptionDTO updateOption(@RequestBody @Valid UpdateOptionDTO updateOptionDTO) {
+        return optionService.updateOption(updateOptionDTO);
     }
     @GetMapping("/options")
     @ResponseStatus(HttpStatus.OK)

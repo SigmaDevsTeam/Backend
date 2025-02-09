@@ -1,11 +1,19 @@
 package com.sigmadevs.testtask.service;
 
 import com.sigmadevs.testtask.app.dto.CommentDTO;
+import com.sigmadevs.testtask.app.dto.CreateCommentDTO;
+import com.sigmadevs.testtask.app.dto.UpdateCommentDTO;
 import com.sigmadevs.testtask.app.entity.Comment;
+import com.sigmadevs.testtask.app.entity.Quest;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.exception.CommentNotFoundException;
+import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.CommentMapper;
 import com.sigmadevs.testtask.app.repository.CommentRepository;
+import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.service.CommentService;
+import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.security.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,77 +29,205 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
-
     @Mock
-    private CommentRepository commentRepository;
-
+    CommentRepository commentRepository;
     @Mock
-    private CommentMapper commentMapper;
-
+    UserRepository userRepository;
+    @Mock
+    QuestRepository questRepository;
+    @Mock
+    CommentMapper commentMapper;
     @InjectMocks
-    private CommentService commentService;
-
-    private CommentDTO commentDTO;
-    private Comment comment;
+    CommentService commentService;
+    Comment comment;
+    CommentDTO commentDTO;
+    CreateCommentDTO createCommentDTO;
+    UpdateCommentDTO updateCommentDTO;
 
     @BeforeEach
     void setUp() {
-        commentDTO = new CommentDTO();
-        commentDTO.setId(1L);
-        commentDTO.setTitle("Test Comment");
 
-        comment = new Comment();
-        comment.setId(1L);
-        comment.setTitle("Test Comment");
+        comment = Comment.builder()
+                .id(1L)
+                .title("Test title")
+                .build();
+
+        commentDTO = CommentDTO.builder()
+                .title("Test title")
+                .build();
+
+        createCommentDTO = CreateCommentDTO.builder()
+                .title("Test title")
+                .questId(1L)
+                .userId(1L)
+                .build();
+
+        updateCommentDTO = UpdateCommentDTO.builder()
+                .id(1L)
+                .title("Test title")
+                .build();
+
     }
 
     @Test
-    void createComment_shouldReturnCommentDTO_whenValidDataProvided() {
-        when(commentMapper.toEntity(any(CommentDTO.class))).thenReturn(comment);
-        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-        when(commentMapper.toDTO(any(Comment.class))).thenReturn(commentDTO);
+    void createComment_shouldReturnCommentDTO() {
 
-        CommentDTO result = commentService.createComment(commentDTO);
+        when(userRepository.findById(createCommentDTO.getUserId()))
+                .thenReturn(Optional.of(new User()));
+
+        when(questRepository.findById(createCommentDTO.getUserId()))
+                .thenReturn(Optional.of(new Quest()));
+
+        when(commentMapper.toEntity(any(CreateCommentDTO.class), any(User.class), any(Quest.class)))
+                .thenReturn(comment);
+
+        when(commentRepository.save(any(Comment.class)))
+                .thenReturn(comment);
+
+        when(commentMapper.toDTO(any(Comment.class))).
+                thenReturn(commentDTO);
+
+        CommentDTO result = commentService.createComment(createCommentDTO);
 
         assertNotNull(result);
         assertEquals(commentDTO.getId(), result.getId());
-        verify(commentRepository, times(1)).save(any(Comment.class));
+
+        verify(userRepository).findById(createCommentDTO.getUserId());
+        verify(questRepository).findById(createCommentDTO.getQuestId());
+        verify(commentMapper).toEntity(any(CreateCommentDTO.class), any(User.class), any(Quest.class));
+        verify(commentRepository).save(any(Comment.class));
+        verify(commentMapper).toDTO(any(Comment.class));
     }
 
     @Test
-    void updateComment_shouldReturnUpdatedCommentDTO_whenCommentExists() {
-        when(commentRepository.findById(commentDTO.getId())).thenReturn(Optional.of(comment));
-        when(commentMapper.toDTO(any(Comment.class))).thenReturn(commentDTO);
+    void createComment_shouldThrowException_whenUserNotFound() {
 
-        CommentDTO result = commentService.updateComment(commentDTO);
+        when(userRepository.findById(createCommentDTO.getUserId()))
+                .thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> commentService.createComment(createCommentDTO));
+        assertEquals("User with " + createCommentDTO.getUserId() + " Id not found!", exception.getMessage());
+
+        verify(userRepository).findById(createCommentDTO.getUserId());
+        verify(commentMapper, never()).toEntity(any(CreateCommentDTO.class), any(User.class), any(Quest.class));
+        verify(questRepository, never()).findById(createCommentDTO.getQuestId());
+        verify(commentRepository, never()).save(any(Comment.class));
+        verify(commentMapper,never()).toDTO(any(Comment.class));
+    }
+    @Test
+    void createComment_shouldThrowException_whenQuestNotFound() {
+
+        when(userRepository.findById(createCommentDTO.getUserId()))
+                .thenReturn(Optional.of(new User()));
+
+        when(questRepository.findById(createCommentDTO.getQuestId()))
+                .thenReturn(Optional.empty());
+
+        QuestNotFoundException exception = assertThrows(QuestNotFoundException.class, () -> commentService.createComment(createCommentDTO));
+
+        assertEquals("Quest with Id " +createCommentDTO.getQuestId() + " not found!", exception.getMessage());
+
+        verify(userRepository).findById(createCommentDTO.getUserId());
+        verify(questRepository).findById(createCommentDTO.getQuestId());
+        verify(commentMapper, never()).toEntity(any(CreateCommentDTO.class), any(User.class), any(Quest.class));
+        verify(commentRepository, never()).save(any(Comment.class));
+        verify(commentMapper,never()).toDTO(any(Comment.class));
+    }
+
+    @Test
+    void updateComment_shouldReturnUpdatedCommentDTO() {
+
+        when(commentRepository.findById(updateCommentDTO.getId()))
+                .thenReturn(Optional.of(comment));
+
+        when(commentMapper.toDTO(any(Comment.class)))
+                .thenReturn(commentDTO);
+
+        CommentDTO result = commentService.updateComment(updateCommentDTO);
 
         assertNotNull(result);
         assertEquals(commentDTO.getTitle(), result.getTitle());
-        verify(commentRepository, times(1)).findById(commentDTO.getId());
+
+        verify(commentRepository).findById(updateCommentDTO.getId());
+        verify(commentMapper).toDTO(any(Comment.class));
+
     }
 
     @Test
     void updateComment_shouldThrowException_whenCommentDoesNotExist() {
-        when(commentRepository.findById(commentDTO.getId())).thenReturn(Optional.empty());
 
-        assertThrows(CommentNotFoundException.class, () -> commentService.updateComment(commentDTO));
-        verify(commentRepository, times(1)).findById(commentDTO.getId());
+        when(commentRepository.findById(updateCommentDTO.getId()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(CommentNotFoundException.class, () -> commentService.updateComment(updateCommentDTO));
+
+        verify(commentRepository).findById(updateCommentDTO.getId());
+        verify(commentMapper, never()).toDTO(any(Comment.class));
+
+    }
+
+    @Test
+    void getCommentById_shouldReturnCommentDTO() {
+
+        long id = 1L;
+
+        when(commentRepository.findById(id))
+                .thenReturn(Optional.of(comment));
+
+        when(commentMapper.toDTO(comment))
+                .thenReturn(commentDTO);
+
+        CommentDTO actualComment = commentService.getCommentById(id);
+
+        assertNotNull(actualComment);
+        assertEquals(commentDTO, actualComment);
+
+        verify(commentRepository).findById(id);
+        verify(commentMapper).toDTO(any(Comment.class));
+    }
+
+    @Test
+    void getCommentById_shouldThrowException_whenCommentNotFound() {
+
+        long id = 100L;
+
+        when(commentRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> commentService.getCommentById(id));
+
+        assertEquals("Comment with Id " + id + " not found!", exception.getMessage());
+
+        verify(commentRepository).findById(id);
+        verify(commentMapper, never()).toDTO(any(Comment.class));
     }
 
     @Test
     void removeCommentById_shouldRemoveComment_whenCommentExists() {
-        when(commentRepository.existsById(commentDTO.getId())).thenReturn(true);
 
-        commentService.removeCommentById(commentDTO.getId());
+        Long id = 1L;
 
-        verify(commentRepository, times(1)).deleteById(commentDTO.getId());
+        when(commentRepository.existsById(id)).thenReturn(true);
+
+        commentService.removeCommentById(id);
+
+        verify(commentRepository).existsById(id);
+        verify(commentRepository).deleteById(id);
+
     }
 
     @Test
     void removeCommentById_shouldThrowException_whenCommentDoesNotExist() {
-        when(commentRepository.existsById(commentDTO.getId())).thenReturn(false);
 
-        assertThrows(CommentNotFoundException.class, () -> commentService.removeCommentById(commentDTO.getId()));
-        verify(commentRepository, times(1)).existsById(commentDTO.getId());
+        Long id = 1L;
+
+        when(commentRepository.existsById(id))
+                .thenReturn(false);
+
+        assertThrows(CommentNotFoundException.class, () -> commentService.removeCommentById(id));
+
+        verify(commentRepository).existsById(id);
+        verify(commentRepository, never()).deleteById(id);
+
     }
 }

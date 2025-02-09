@@ -1,10 +1,15 @@
 package com.sigmadevs.testtask.app.service;
 
+import com.sigmadevs.testtask.app.dto.CreateQuestDTO;
 import com.sigmadevs.testtask.app.dto.QuestDTO;
+import com.sigmadevs.testtask.app.dto.UpdateQuestDTO;
 import com.sigmadevs.testtask.app.entity.Quest;
+import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
+import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.security.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,29 +23,40 @@ import java.util.List;
 public class QuestService {
 
     private final QuestRepository questRepository;
+
+    private final UserRepository userRepository;
+
     private final QuestMapper questMapper;
 
-    public QuestDTO createQuest(QuestDTO questDTO) {
-        log.info("Creating a new quest: {}", questDTO);
-        Quest quest = questRepository.save(questMapper.toEntity(questDTO));
+    public QuestDTO createQuest(CreateQuestDTO createQuestDTO) {
+        log.info("Creating a new quest with title: {}", createQuestDTO.getTitle());
+
+        User user = userRepository.findById(createQuestDTO.getUserId())
+                .orElseThrow(() -> {
+                    log.error("User with ID {} not found", createQuestDTO.getUserId());
+                    return new UserNotFoundException("User with " + createQuestDTO.getUserId() + " Id not found!");
+                });
+
+        Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user));
         log.info("Quest created successfully with ID: {}", quest.getId());
         return questMapper.toDTO(quest);
     }
 
     @Transactional
-    public QuestDTO updateQuest(QuestDTO questDTO) {
-        log.info("Updating quest with ID: {}", questDTO.getId());
-        Quest quest = questRepository.findById(questDTO.getId())
+    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO) {
+        log.info("Updating quest with ID: {}", updateQuestDTO.getId());
+        Quest quest = questRepository.findById(updateQuestDTO.getId())
                 .orElseThrow(() -> {
-                    log.error("Quest with ID {} not found", questDTO.getId());
-                    return new QuestNotFoundException("Quest with Id " + questDTO.getId() + " not found!");
+                    log.error("Quest with ID {} not found", updateQuestDTO.getId());
+                    return new QuestNotFoundException("Quest with Id " + updateQuestDTO.getId() + " not found!");
                 });
 
-        quest.setTitle(questDTO.getTitle());
-        quest.setDescription(questDTO.getDescription());
-        quest.setTimeLimit(questDTO.getTimeLimit());
+        quest.setTitle(updateQuestDTO.getTitle());
+        quest.setDescription(updateQuestDTO.getDescription());
+        quest.setImage(updateQuestDTO.getImage());
+        quest.setTimeLimit(updateQuestDTO.getTimeLimit());
 
-        log.info("Quest with ID {} updated successfully", questDTO.getId());
+        log.info("Quest with ID {} updated successfully", updateQuestDTO.getId());
         return questMapper.toDTO(quest);
     }
 

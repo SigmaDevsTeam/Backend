@@ -1,7 +1,6 @@
 package com.sigmadevs.testtask.repository;
 
 import com.sigmadevs.testtask.app.entity.Comment;
-import com.sigmadevs.testtask.app.entity.Option;
 import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.repository.CommentRepository;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @Testcontainers
 @SpringBootTest
@@ -125,9 +123,32 @@ public class CommentRepositoryIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1L,2L,3L,4L,5L,6L,7L,8L,9L,10L})
+    void existsById_shouldReturnTrue(long id) {
+        boolean isCommentExists = commentRepository.existsById(id);
+        assertTrue(isCommentExists);
+    }
+
+    @Test
+    void existsById_shouldReturnFalse_whenCommentNotFound() {
+        long id = 100L;
+        boolean isCommentExists = commentRepository.existsById(id);
+        assertFalse(isCommentExists);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L,2L,3L,4L,5L,6L,7L,8L,9L,10L})
     void deleteById_shouldRemoveComment(long id) {
         commentRepository.deleteById(id);
         assertEquals(9, commentRepository.count());
+        assertEquals(10, userRepository.count());
+        assertEquals(5, questRepository.count());
+    }
+
+    @Test
+    void deleteById_shouldNotRemoveComment_whenCommentNotFound() {
+        long id = 100;
+        commentRepository.deleteById(id);
+        assertEquals(10, commentRepository.count());
         assertEquals(10, userRepository.count());
         assertEquals(5, questRepository.count());
     }

@@ -1,6 +1,5 @@
 package com.sigmadevs.testtask.repository;
 
-import com.sigmadevs.testtask.app.entity.Option;
 import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.Task;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 
 @Testcontainers
 @SpringBootTest
@@ -94,9 +92,29 @@ public class TaskRepositoryIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1L,2L,3L,4L,5L})
+    void existsById_shouldReturnTrue(long id) {
+        boolean isTaskExists = taskRepository.existsById(id);
+        assertTrue(isTaskExists);
+    }
+    @Test
+    void existsById_shouldReturnFalse_whenTaskNotFound() {
+        long id = 100L;
+        boolean isTaskExists = taskRepository.existsById(id);
+        assertFalse(isTaskExists);
+    }
+    @ParameterizedTest
+    @ValueSource(longs = {1L,2L,3L,4L,5L})
     void deleteById_shouldRemoveTask(long id) {
         taskRepository.deleteById(id);
         assertEquals(4, taskRepository.count());
+        assertEquals(5, questRepository.count());
+    }
+    @ParameterizedTest
+    @ValueSource(longs = {1L,2L,3L,4L,5L})
+    void deleteById_shouldNotRemoveTask_whenTaskNotFound() {
+        long id = 100L;
+        taskRepository.deleteById(id);
+        assertEquals(5, taskRepository.count());
         assertEquals(5, questRepository.count());
     }
 

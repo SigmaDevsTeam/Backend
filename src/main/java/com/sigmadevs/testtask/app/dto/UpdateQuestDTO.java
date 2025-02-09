@@ -1,35 +1,24 @@
 package com.sigmadevs.testtask.app.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.aspectj.bridge.IMessage;
 
 import java.sql.Time;
-import java.util.List;
-
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestDTO {
+public class UpdateQuestDTO {
 
+    @NotNull(message = "Field should contains Id!")
     private Long id;
-
+    @NotNull(message = "Field should contains title!")
     private String title;
-
     private String description;
-
     private String image;
-
-    private Integer taskCount;
-
     private Time timeLimit;
-
-    private UserDTO userDTO;
-
-    private Integer usersRated;
-
-    private Float rating;
 
 }

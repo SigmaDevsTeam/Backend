@@ -26,8 +26,4 @@ public class UserDTO {
 
     private Float rating;
 
-    private List<QuestDTO> quests;
-
-    private List<CommentDTO> comments;
-
 }

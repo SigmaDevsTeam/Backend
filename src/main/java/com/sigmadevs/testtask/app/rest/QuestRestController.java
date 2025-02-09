@@ -1,6 +1,8 @@
 package com.sigmadevs.testtask.app.rest;
 
+import com.sigmadevs.testtask.app.dto.CreateQuestDTO;
 import com.sigmadevs.testtask.app.dto.QuestDTO;
+import com.sigmadevs.testtask.app.dto.UpdateQuestDTO;
 import com.sigmadevs.testtask.app.service.QuestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,13 @@ public class QuestRestController {
     private final QuestService questService;
     @PostMapping("/quests")
     @ResponseStatus(HttpStatus.CREATED)
-    public QuestDTO createQuest(@RequestBody @Valid QuestDTO questDTO) {
-        return questService.createQuest(questDTO);
+    public QuestDTO createQuest(@RequestBody @Valid CreateQuestDTO createQuestDTO) {
+        return questService.createQuest(createQuestDTO);
     }
     @PutMapping("/quests")
     @ResponseStatus(HttpStatus.OK)
-    public QuestDTO updateQuest(@RequestBody @Valid QuestDTO questDTO) {
-        return questService.updateQuest(questDTO);
+    public QuestDTO updateQuest(@RequestBody @Valid UpdateQuestDTO updateQuestDTO) {
+        return questService.updateQuest(updateQuestDTO);
     }
     @GetMapping("/quests")
     @ResponseStatus(HttpStatus.OK)

@@ -88,10 +88,31 @@ public class QuestRepositoryIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(longs = {1L,2L,3L,4L,5L})
+    void existsById_shouldReturnTrue(long id) {
+        boolean isQuestExists = questRepository.existsById(id);
+        assertTrue(isQuestExists);
+    }
+    @Test
+    void existsById_shouldReturnFalse_whenQuestNotFound() {
+        long id = 100L;
+        boolean isQuestExists = questRepository.existsById(id);
+        assertFalse(isQuestExists);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L,2L,3L,4L,5L})
     void deleteById_shouldRemoveQuest(long id) {
         questRepository.deleteById(id);
         assertEquals(4, questRepository.count());
         assertNotEquals(10,  commentRepository.count());
+    }
+
+    @Test
+    void deleteById_shouldNotRemoveQuest_whenQuestNotFound() {
+        long id = 100L;
+        questRepository.deleteById(id);
+        assertEquals(5, questRepository.count());
+        assertEquals(10,  commentRepository.count());
     }
 
 }

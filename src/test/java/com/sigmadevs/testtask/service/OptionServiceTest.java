@@ -1,12 +1,15 @@
 package com.sigmadevs.testtask.service;
 
+import com.sigmadevs.testtask.app.dto.CreateOptionDTO;
 import com.sigmadevs.testtask.app.dto.OptionDTO;
-import com.sigmadevs.testtask.app.dto.TaskDTO;
+import com.sigmadevs.testtask.app.dto.UpdateOptionDTO;
 import com.sigmadevs.testtask.app.entity.Option;
 import com.sigmadevs.testtask.app.entity.Task;
 import com.sigmadevs.testtask.app.exception.OptionNotFoundException;
+import com.sigmadevs.testtask.app.exception.TaskNotFoundException;
 import com.sigmadevs.testtask.app.mapper.OptionMapper;
 import com.sigmadevs.testtask.app.repository.OptionRepository;
+import com.sigmadevs.testtask.app.repository.TaskRepository;
 import com.sigmadevs.testtask.app.service.OptionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,29 +34,35 @@ public class OptionServiceTest {
     OptionRepository optionRepository;
     @Mock
     OptionMapper optionMapper;
+    @Mock
+    TaskRepository taskRepository;
     Option option;
     OptionDTO optionDTO;
+    CreateOptionDTO createOptionDTO;
+    UpdateOptionDTO updateOptionDTO;
     @BeforeEach
     void setUp() {
-
-        TaskDTO taskDTO = TaskDTO.builder()
-                .title("Test title")
-                .build();
-
-        Task task = Task.builder()
-                .title("Test title")
-                .build();
 
         optionDTO = OptionDTO.builder()
                 .title("Test title")
                 .isTrue(true)
-                .taskDTO(taskDTO)
                 .build();
 
         option = Option.builder()
                 .title("Test title")
                 .isTrue(true)
-                .task(task)
+                .build();
+
+        createOptionDTO = CreateOptionDTO.builder()
+                .title("Test title")
+                .isTrue(true)
+                .taskId(1L)
+                .build();
+
+        updateOptionDTO = UpdateOptionDTO.builder()
+                .id(1L)
+                .title("Test title")
+                .isTrue(true)
                 .build();
 
     }
@@ -61,7 +70,10 @@ public class OptionServiceTest {
     @Test
     void createOption_shouldReturnOptionDTO() {
 
-        when(optionMapper.toEntity(any(OptionDTO.class)))
+        when(taskRepository.findById(createOptionDTO.getTaskId()))
+                .thenReturn(Optional.of(new Task()));
+
+        when(optionMapper.toEntity(any(CreateOptionDTO.class), any(Task.class)))
                 .thenReturn(option);
 
         when(optionRepository.save(any(Option.class)))
@@ -70,16 +82,63 @@ public class OptionServiceTest {
         when(optionMapper.toDTO(any(Option.class)))
                 .thenReturn(optionDTO);
 
-        OptionDTO actualOptionDTO = optionService.createOption(optionDTO);
+        OptionDTO actualOptionDTO = optionService.createOption(createOptionDTO);
 
         assertNotNull(actualOptionDTO);
         assertEquals(actualOptionDTO, optionDTO);
 
-        verify(optionMapper).toEntity(any(OptionDTO.class));
+        verify(taskRepository).findById(createOptionDTO.getTaskId());
+        verify(optionMapper).toEntity(any(CreateOptionDTO.class), any(Task.class));
         verify(optionRepository).save(any(Option.class));
         verify(optionMapper).toDTO(any(Option.class));
     }
+    @Test
+    void createOption_shouldThrowException_whenTaskNotFound() {
 
+        when(taskRepository.findById(createOptionDTO.getTaskId()))
+                .thenReturn(Optional.empty());
+
+        TaskNotFoundException exception = assertThrows(TaskNotFoundException.class, () -> optionService.createOption(createOptionDTO));
+
+        assertEquals("Task with Id " + createOptionDTO.getTaskId() + " not found!", exception.getMessage());
+
+        verify(taskRepository).findById(createOptionDTO.getTaskId());
+        verify(optionMapper, never()).toEntity(any(CreateOptionDTO.class), any(Task.class));
+        verify(optionRepository, never()).save(any(Option.class));
+        verify(optionMapper,never()).toDTO(any(Option.class));
+    }
+    @Test
+    void updateOption_shouldReturnOptionDTO() {
+
+        optionDTO.setTitle("Test title 2");
+
+        when(optionRepository.findById(updateOptionDTO.getId()))
+                .thenReturn(Optional.of(option));
+
+        when(optionMapper.toDTO(any(Option.class)))
+                .thenReturn(optionDTO);
+
+        OptionDTO actualOptionDTO = optionService.updateOption(updateOptionDTO);
+
+        assertNotNull(actualOptionDTO);
+        assertEquals(actualOptionDTO, optionDTO);
+
+        verify(optionRepository).findById(updateOptionDTO.getId());
+        verify(optionMapper).toDTO(any(Option.class));
+    }
+    @Test
+    void updateOption_shouldThrowException_whenOptionNotFound() {
+
+        when(optionRepository.findById(updateOptionDTO.getId()))
+                .thenReturn(Optional.empty());
+
+        OptionNotFoundException exception = assertThrows(OptionNotFoundException.class, () -> optionService.updateOption(updateOptionDTO));
+
+        assertEquals("Option with Id " + updateOptionDTO.getId() + " not found!", exception.getMessage());
+
+        verify(optionRepository).findById(updateOptionDTO.getId());
+        verify(optionMapper,never()).toDTO(any(Option.class));
+    }
     @Test
     void getAllOptions_shouldReturnOptionDTOList() {
 
@@ -98,40 +157,6 @@ public class OptionServiceTest {
         verify(optionRepository).findAll();
         verify(optionMapper).toDTOList(any(List.class));
 
-    }
-
-    @Test
-    void updateOption_shouldReturnOptionDTO() {
-
-        optionDTO.setTitle("Test title 2");
-
-        when(optionRepository.findById(optionDTO.getId()))
-                .thenReturn(Optional.of(option));
-
-        when(optionMapper.toDTO(any(Option.class)))
-                .thenReturn(optionDTO);
-
-        OptionDTO actualOptionDTO = optionService.updateOption(optionDTO);
-
-        assertNotNull(actualOptionDTO);
-        assertEquals(actualOptionDTO, optionDTO);
-
-        verify(optionRepository).findById(optionDTO.getId());
-        verify(optionMapper).toDTO(any(Option.class));
-    }
-
-    @Test
-    void updateOption_shouldThrowException_whenOptionNotFound() {
-
-        when(optionRepository.findById(optionDTO.getId()))
-                .thenReturn(Optional.empty());
-
-        OptionNotFoundException exception = assertThrows(OptionNotFoundException.class, () -> optionService.updateOption(optionDTO));
-
-        assertEquals("Option with Id " + optionDTO.getId() + " not found!", exception.getMessage());
-
-        verify(optionRepository).findById(optionDTO.getId());
-        verify(optionMapper,never()).toDTO(any(Option.class));
     }
 
     @Test

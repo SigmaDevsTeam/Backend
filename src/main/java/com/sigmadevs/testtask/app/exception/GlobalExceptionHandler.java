@@ -6,12 +6,16 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
@@ -21,18 +25,19 @@ import java.util.Set;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    @ResponseBody
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiError handleValidationExceptions(MethodArgumentNotValidException e) {
-
-        String defaultMessage = e.getBindingResult().getAllErrors().stream()
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
+        String defaultMessage = ex.getBindingResult().getAllErrors().stream()
                 .findFirst()
                 .map(error -> error.getDefaultMessage())
                 .orElse("Message validation error!");
 
-        return new ApiError(HttpStatus.UNPROCESSABLE_ENTITY.value(), defaultMessage);
+        return ResponseEntity.unprocessableEntity().body(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY.value(), defaultMessage));
     }
+
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CommentNotFoundException.class)

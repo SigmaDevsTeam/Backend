@@ -1,9 +1,14 @@
 package com.sigmadevs.testtask.app.service;
 
+import com.sigmadevs.testtask.app.dto.CreateTaskDTO;
 import com.sigmadevs.testtask.app.dto.TaskDTO;
+import com.sigmadevs.testtask.app.dto.UpdateTaskDTO;
+import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.Task;
+import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.exception.TaskNotFoundException;
 import com.sigmadevs.testtask.app.mapper.TaskMapper;
+import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,40 +23,47 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final QuestRepository questRepository;
     private final TaskMapper taskMapper;
 
-    public TaskDTO createTask(TaskDTO taskDTO) {
-        log.info("Creating task with title: {}", taskDTO.getTitle());
-        Task task = taskRepository.save(taskMapper.toEntity(taskDTO));
+    public TaskDTO createTask(CreateTaskDTO createTaskDTO) {
+        log.info("Creating task with title: {}", createTaskDTO.getTitle());
+
+        Quest quest = questRepository.findById(createTaskDTO.getQuestId())
+                .orElseThrow(() -> {
+                    log.error("Quest with ID {} not found", createTaskDTO.getQuestId());
+                    return new QuestNotFoundException("Quest with Id " + createTaskDTO.getQuestId() + " not found!");
+                });
+
+        Task task = taskRepository.save(taskMapper.toEntity(createTaskDTO, quest));
         log.info("Task created with ID: {}", task.getId());
         return taskMapper.toDTO(task);
     }
 
+    @Transactional
+    public TaskDTO updateTask(UpdateTaskDTO updateTaskDTO) {
+        log.info("Updating task with ID: {}", updateTaskDTO.getId());
+
+        Task task = taskRepository.findById(updateTaskDTO.getId())
+                .orElseThrow(() -> {
+                    log.warn("Task with ID {} not found!", updateTaskDTO.getId());
+                    return new TaskNotFoundException("Task with Id " + updateTaskDTO.getId() + " not found!");
+                });
+
+        task.setTitle(updateTaskDTO.getTitle());
+        task.setAudio(updateTaskDTO.getAudio());
+        task.setVideo(updateTaskDTO.getVideo());
+        task.setImage(updateTaskDTO.getImage());
+        task.setOpenAnswer(updateTaskDTO.getOpenAnswer());
+
+        log.info("Task with ID {} updated successfully", task.getId());
+        return taskMapper.toDTO(task);
+    }
     public List<TaskDTO> getAllTasks() {
         log.info("Fetching all tasks...");
         List<Task> tasks = taskRepository.findAll();
         log.info("Retrieved {} tasks", tasks.size());
         return taskMapper.toDTOList(tasks);
-    }
-
-    @Transactional
-    public TaskDTO updateTask(TaskDTO taskDTO) {
-        log.info("Updating task with ID: {}", taskDTO.getId());
-
-        Task task = taskRepository.findById(taskDTO.getId())
-                .orElseThrow(() -> {
-                    log.warn("Task with ID {} not found!", taskDTO.getId());
-                    return new TaskNotFoundException("Task with Id " + taskDTO.getId() + " not found!");
-                });
-
-        task.setTitle(taskDTO.getTitle());
-        task.setAudio(taskDTO.getAudio());
-        task.setVideo(taskDTO.getVideo());
-        task.setImage(taskDTO.getImage());
-        task.setOpenAnswer(taskDTO.getOpenAnswer());
-
-        log.info("Task with ID {} updated successfully", task.getId());
-        return taskMapper.toDTO(task);
     }
 
     public TaskDTO getTaskById(long id) {
