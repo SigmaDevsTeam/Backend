@@ -2,7 +2,7 @@ HELP.md
 .gradle
 .env
 /src/main/resources/application-dev.yaml
-/src/main/resources/keystore/
+#/src/main/resources/keystore/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

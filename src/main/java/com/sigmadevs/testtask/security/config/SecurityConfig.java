@@ -47,10 +47,10 @@ public class SecurityConfig {
                 cors(Customizer.withDefaults()).
                 exceptionHandling(e -> e.authenticationEntryPoint(new AuthenticationEntryPoint())).
                 oauth2Login(e -> e.
-                        loginPage("/oauth2/authorization/google")
-                        .successHandler(oAuth2LoginSuccessHandler)).
+//                        loginPage("/oauth2/authorization/google").
+                        successHandler(oAuth2LoginSuccessHandler)).
                 authorizeHttpRequests(request ->
-                        request.requestMatchers("/","/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home").permitAll().
+                        request.requestMatchers("/","/x"    ,"/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home","/oauth2/**","/getCookie").permitAll().
                                 requestMatchers("/admin/**").hasAuthority(Role.ADMIN.getAuthority()).
                                 anyRequest().authenticated()).
                 logout(e -> e
@@ -63,12 +63,14 @@ public class SecurityConfig {
                         })
                 ).
                 userDetailsService(userService).
+                requiresChannel(channel ->
+                channel.anyRequest().requiresSecure()).
                 addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
                 build();
     }
 
 //    @Bean
 //    public CookieSameSiteSupplier applicationCookieSameSiteSupplier() {
-//        return CookieSameSiteSupplier.ofLax();
+//        return CookieSameSiteSupplier.ofNone();
 //    }
 }

@@ -15,7 +15,6 @@ public class BucketConfig {
     @Value("${aws.secret_access_key}")
     private String secretAccessKey;
 
-
     @Bean
     public S3Client getClient() {
         return S3Client.builder().

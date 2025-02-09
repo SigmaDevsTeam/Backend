@@ -6,7 +6,7 @@ import com.sigmadevs.testtask.security.dto.UserRegistrationDto;
 import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.service.AuthService;
 import com.sigmadevs.testtask.security.service.UserService;
-import jakarta.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +36,12 @@ public class AuthController {
     @GetMapping("/currentAccount")
     public ResponseEntity<UserGetDto> getCurrentAccount(Principal principal) {
         return ResponseEntity.ok(userMapper.userToUserGetDto(userService.findByUsername(principal.getName())));
+    }
+
+    @PostMapping("/getCookie")
+    public ResponseEntity<String> getCookie(HttpServletResponse response,@RequestBody String jwt) {
+        response.addCookie(authService.createCookie(jwt));
+        return ResponseEntity.ok("Success");
     }
 }
 

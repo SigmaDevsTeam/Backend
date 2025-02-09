@@ -9,6 +9,7 @@ import com.sigmadevs.testtask.security.mapper.UserMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,8 @@ public class AuthService {
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    @Value("front-end-url")
+    private String cors;
 
     public ResponseEntity<UserGetDto> login(UserLoginDto userLoginDto) {
         String login = userLoginDto.getLogin();
@@ -46,7 +49,6 @@ public class AuthService {
         return ResponseEntity.ok(userMapper.userToUserGetDto(user));
     }
 
-
     private void setCookie(User user) {
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
                 .getRequestAttributes())
@@ -60,8 +62,8 @@ public class AuthService {
         cookie.setMaxAge(24_192_000);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-//        cookie.setDomain(cors);
+        cookie.setSecure(true);
+//        cookie.setDomain("taupe-raindrop-f35bc9.netlify.app");
         return cookie;
     }
 }
