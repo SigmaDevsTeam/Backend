@@ -70,17 +70,17 @@ public class UserService implements UserDetailsService {
     }
 
     //manipulations
-    @Transactional
-    public User save(@NotNull User newUser) {
-        if (userRepository.existsUserByUsername(newUser.getUsername())) {
-            throw new UsernameAlreadyExistsException("Username already exists");
-        }
-        if (newUser.getPassword() != null) {
-
-            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        }
-        return userRepository.save(newUser);
-    }
+//    @Transactional
+//    public User save(@NotNull User newUser) {
+//        if (userRepository.existsUserByUsername(newUser.getUsername())) {
+//            throw new UsernameAlreadyExistsException("Username already exists");
+//        }
+//        if (newUser.getPassword() != null) {
+//
+//            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+//        }
+//        return userRepository.save(newUser);
+//    }
 
     @Transactional
     public User save(@NotNull User newUser, MultipartFile image) {

@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
@@ -63,9 +64,10 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                 throw new RuntimeException();//TODO
             }
             System.out.println("HELLO OAUTH: " + email + " : " + name + " : " + username);
-
+            AtomicReference<User> main = new AtomicReference<>();
             userService.findByEmailOptional(email)
                     .ifPresentOrElse(user -> {
+                        main.set(user);
                         DefaultOAuth2User oauthUser = new DefaultOAuth2User(
                                 Collections.singleton(user.getRole()),
                                 modifiableMap,
@@ -76,15 +78,16 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                                 oauthUser.getAuthorities(),
                                 oAuth2AuthenticationToken.getAuthorizedClientRegistrationId()
                         );
-                        Cookie cookie = authService.createCookie(jwtUtils.generateToken(user));
-                        response.addCookie(cookie);
+//                        Cookie cookie = authService.createCookie(jwtUtils.generateToken(user));
+//                        response.addCookie(cookie);
                         SecurityContextHolder.getContext().setAuthentication(securityAuth);
                     }, () -> {
                         User newUser = new User();
                         newUser.setRole(Role.USER);
                         newUser.setEmail(email);
                         newUser.setUsername(username);
-                        userService.save(newUser);
+                        User saved = userService.save(newUser, null);
+                        main.set(saved);
                         DefaultOAuth2User oauthUser = new DefaultOAuth2User(
                                 Collections.singleton(newUser.getRole()),
                                 modifiableMap,
@@ -97,7 +100,13 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                         );
                         SecurityContextHolder.getContext().setAuthentication(securityAuth);
                     });
-            response.sendRedirect(frontendUrl);
+            User user = main.get();
+//            Cookie cookie = authService.createCookie(jwtUtils.generateToken(user));
+//            response.addCookie(cookie);
+            this.setAlwaysUseDefaultTargetUrl(true);
+            this.setDefaultTargetUrl(frontendUrl+"?jwt="+jwtUtils.generateToken(user));
+//            getRedirectStrategy().sendRedirect(request, response, frontendUrl);
+            super.onAuthenticationSuccess(request, response, authentication);
         }
     }
 
