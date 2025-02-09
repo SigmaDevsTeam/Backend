@@ -5,6 +5,7 @@ import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class QuestService {
         return questMapper.toDTO(quest);
     }
 
+    @Transactional
     public QuestDTO updateQuest(QuestDTO questDTO) {
         log.info("Updating quest with ID: {}", questDTO.getId());
         Quest quest = questRepository.findById(questDTO.getId())

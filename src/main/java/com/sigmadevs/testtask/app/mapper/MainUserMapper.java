@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface MainUserMapper {
     @Mapping(target = "quests", ignore = true)
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "password", ignore = true)

@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = { UserMapper.class, CommentMapper.class })
+@Mapper(componentModel = "spring", uses = { MainUserMapper.class, CommentMapper.class })
 public interface QuestMapper {
     @Mapping(source = "userDTO", target = "user")
     @Mapping(target = "comments", ignore = true)

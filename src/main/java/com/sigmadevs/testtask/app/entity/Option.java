@@ -15,12 +15,13 @@ public class Option {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_true")
     private Boolean isTrue;
     
-    @ManyToOne
-    @JoinColumn(name = "task_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 }

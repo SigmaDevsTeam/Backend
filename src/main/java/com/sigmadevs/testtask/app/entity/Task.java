@@ -24,7 +24,7 @@ public class Task {
     private String image;
     private String openAnswer;
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "quest_id")
     private Quest quest;
 
