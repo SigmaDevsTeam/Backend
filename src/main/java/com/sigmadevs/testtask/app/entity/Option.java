@@ -1,28 +1,27 @@
 package com.sigmadevs.testtask.app.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
-@Table(name = "option")
-@Data
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Table(name = "option")
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank
+
+    @Column(nullable = false)
     private String title;
-    
-    @NotNull
+
+    @Column(nullable = false, name = "is_true")
     private Boolean isTrue;
     
-    @ManyToOne
-    @JoinColumn(name = "task_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 }

@@ -3,7 +3,11 @@ package com.sigmadevs.testtask.app.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.sql.Time;
 import java.util.List;
@@ -19,7 +23,7 @@ public class Quest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank
+    @Column(nullable = false)
     private String title;
     
     private String description;

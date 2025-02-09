@@ -31,6 +31,6 @@ create table option
 (
     id      bigserial primary key,
     title   text    not null,
-    isTrue  boolean not null,
+    is_true  boolean not null,
     task_id bigint references task (id)
 );

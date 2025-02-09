@@ -16,15 +16,15 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank
+
+    @Column(nullable = false)
     private String title;
     private String audio;
     private String video;
     private String image;
     private String openAnswer;
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "quest_id")
     private Quest quest;
 

@@ -1,7 +1,6 @@
 package com.sigmadevs.testtask.app.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -15,14 +14,14 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank
+    @Column(nullable = false)
     private String title;
     
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
     @ManyToOne
-    @JoinColumn(name = "quest_id")
+    @JoinColumn(name = "quest_id",nullable = false)
     private Quest quest;
 }
