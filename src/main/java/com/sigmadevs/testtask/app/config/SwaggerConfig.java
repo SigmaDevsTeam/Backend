@@ -1,19 +1,20 @@
 package com.sigmadevs.testtask.app.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import java.util.List;
 
 @Configuration
-public class SwaggerConfig {
+public class SwaggerConfig  {
 
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("http://localhost:8080")))
+                .servers(List.of(new Server().url("https://localhost:443")))
                 .info(new Info()
                         .title("Test task API")
                         .version("1.0.0"));

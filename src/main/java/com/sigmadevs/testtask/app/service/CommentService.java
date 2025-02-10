@@ -2,7 +2,6 @@ package com.sigmadevs.testtask.app.service;
 
 import com.sigmadevs.testtask.app.dto.CommentDTO;
 import com.sigmadevs.testtask.app.dto.CreateCommentDTO;
-import com.sigmadevs.testtask.app.dto.QuestDTO;
 import com.sigmadevs.testtask.app.dto.UpdateCommentDTO;
 import com.sigmadevs.testtask.app.entity.Comment;
 import com.sigmadevs.testtask.app.entity.Quest;
@@ -12,7 +11,7 @@ import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.CommentMapper;
 import com.sigmadevs.testtask.app.repository.CommentRepository;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
-import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -45,13 +45,19 @@ spring:
   #db
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/test
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: 1234
+    password: postgres
 
 aws:
   access_key: ${AWS_ACCESS}
   secret_access_key: ${AWS_SECRET}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 server:
   ssl:

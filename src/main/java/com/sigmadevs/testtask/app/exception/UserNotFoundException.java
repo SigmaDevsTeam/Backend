@@ -1,4 +1,4 @@
-package com.sigmadevs.testtask.security.exception;
+package com.sigmadevs.testtask.app.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

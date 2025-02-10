@@ -2,9 +2,8 @@ package com.sigmadevs.testtask.security.service;
 
 import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.security.dto.UserGetDto;
-import com.sigmadevs.testtask.security.dto.UserUpdateDto;
-import com.sigmadevs.testtask.security.exception.UserNotFoundException;
-import com.sigmadevs.testtask.security.exception.UsernameAlreadyExistsException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.exception.UsernameAlreadyExistsException;
 import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
