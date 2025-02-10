@@ -53,6 +53,12 @@ aws:
   access_key: ${AWS_ACCESS}
   secret_access_key: ${AWS_SECRET}
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 server:
   ssl:
     key-store: classpath:keystore/test.p12
