@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -24,7 +25,7 @@ public class QuestDTO {
 
     private Integer taskCount;
 
-    private Time timeLimit;
+    private LocalTime timeLimit;
 
     private UserDTO userDTO;
 

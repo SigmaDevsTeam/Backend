@@ -7,7 +7,9 @@ import com.sigmadevs.testtask.app.service.QuestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,21 +19,26 @@ import java.util.List;
 public class QuestRestController {
 
     private final QuestService questService;
-    @PostMapping("/quests")
+
+    @PostMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public QuestDTO createQuest(@RequestBody @Valid CreateQuestDTO createQuestDTO) {
-        return questService.createQuest(createQuestDTO);
+    public QuestDTO createQuest(@RequestPart @Valid CreateQuestDTO quest, @RequestPart(required = false) MultipartFile image) {
+        return questService.createQuest(quest,image);
     }
-    @PutMapping("/quests")
+
+    //TODO
+    @PutMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public QuestDTO updateQuest(@RequestBody @Valid UpdateQuestDTO updateQuestDTO) {
-        return questService.updateQuest(updateQuestDTO);
+    public QuestDTO updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image) {
+        return questService.updateQuest(quest,image);
     }
+
     @GetMapping("/quests")
     @ResponseStatus(HttpStatus.OK)
     public List<QuestDTO> getAllQuests() {
         return questService.getAllQuests();
     }
+
     @GetMapping("/quests/{id}")
     @ResponseStatus(HttpStatus.OK)
     public QuestDTO getQuestById(@PathVariable("id") Long id) {

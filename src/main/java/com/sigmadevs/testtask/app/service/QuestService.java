@@ -10,10 +10,12 @@ import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.security.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
+import com.sigmadevs.testtask.security.service.ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,9 +28,11 @@ public class QuestService {
 
     private final UserRepository userRepository;
 
+    private final ImageService imageService;
+
     private final QuestMapper questMapper;
 
-    public QuestDTO createQuest(CreateQuestDTO createQuestDTO) {
+    public QuestDTO createQuest(CreateQuestDTO createQuestDTO, MultipartFile image) {
         log.info("Creating a new quest with title: {}", createQuestDTO.getTitle());
 
         User user = userRepository.findById(createQuestDTO.getUserId())
@@ -36,14 +40,15 @@ public class QuestService {
                     log.error("User with ID {} not found", createQuestDTO.getUserId());
                     return new UserNotFoundException("User with " + createQuestDTO.getUserId() + " Id not found!");
                 });
-
+        String imageUrl = imageService.uploadImage("quest", image);
+        createQuestDTO.setImage(imageUrl);
         Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user));
         log.info("Quest created successfully with ID: {}", quest.getId());
         return questMapper.toDTO(quest);
     }
 
     @Transactional
-    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO) {
+    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO,MultipartFile image) {
         log.info("Updating quest with ID: {}", updateQuestDTO.getId());
         Quest quest = questRepository.findById(updateQuestDTO.getId())
                 .orElseThrow(() -> {
@@ -53,7 +58,11 @@ public class QuestService {
 
         quest.setTitle(updateQuestDTO.getTitle());
         quest.setDescription(updateQuestDTO.getDescription());
-        quest.setImage(updateQuestDTO.getImage());
+//        quest.setImage(updateQuestDTO.getImage());
+        if (image!=null) {
+            String url = imageService.updateImage(quest.getImage(), image);
+            quest.setImage(url);
+        }else quest.setImage(null);
         quest.setTimeLimit(updateQuestDTO.getTimeLimit());
 
         log.info("Quest with ID {} updated successfully", updateQuestDTO.getId());

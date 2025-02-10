@@ -5,6 +5,7 @@ import lombok.*;
 import org.aspectj.bridge.IMessage;
 
 import java.sql.Time;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -19,6 +20,6 @@ public class UpdateQuestDTO {
     private String title;
     private String description;
     private String image;
-    private Time timeLimit;
+    private LocalTime timeLimit;
 
 }

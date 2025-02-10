@@ -1,8 +1,5 @@
 spring:
 
-  jpa:
-    generate-ddl: true
-
   servlet:
     multipart:
       enabled: true
@@ -14,6 +11,7 @@ spring:
       static-locations: classpath:/static/ , classpath:/static/avatars/
 
   #security
+
   security:
     front-end-url: https://taupe-raindrop-f35bc9.netlify.app
     front-end-redirect-url-sign-in: https://taupe-raindrop-f35bc9.netlify.app/auth
@@ -40,9 +38,12 @@ spring:
             scope:
               - user
               - user:email
-
-
   #db
+
+
+  jpa:
+    generate-ddl: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -64,5 +65,6 @@ server:
 
 logging:
   level:
-    org.springframework.security.web: debug
-#    com.sigmadevs.testtask: debug
+#    org.springframework.security.web: debug
+    org.springframework.web: debug
+    com.sigmadevs.testtask: debug

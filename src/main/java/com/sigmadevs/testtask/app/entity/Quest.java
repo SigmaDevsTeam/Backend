@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -29,13 +30,16 @@ public class Quest {
     private String description;
     private String image;
     private Integer taskCount;
-    private Time timeLimit;
+    private LocalTime timeLimit;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private Integer usersRated;
     private Float rating;
+
+    @OneToMany(mappedBy = "quest", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Task> tasks;
 
     @OneToMany(mappedBy = "quest", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore

@@ -7,13 +7,16 @@ import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.service.AuthService;
 import com.sigmadevs.testtask.security.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.sql.Time;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,13 +26,14 @@ public class AuthController {
     private final UserMapper userMapper;
 
     @PostMapping("/login")
-    public ResponseEntity<UserGetDto> login(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<UserGetDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
         return authService.login(userLoginDto);
     }
 
     @PostMapping(value = "/registration",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserGetDto> registration(@RequestPart(required = false) MultipartFile image,
-                                                @RequestPart(value = "user")  UserRegistrationDto userRegistrationDto) {
+                                                @RequestPart(value = "user") @Valid  UserRegistrationDto userRegistrationDto) {
+
         return authService.registration(userRegistrationDto, image);
     }
 

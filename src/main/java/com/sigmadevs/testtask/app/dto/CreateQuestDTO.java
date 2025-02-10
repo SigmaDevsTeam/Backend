@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Time;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class CreateQuestDTO {
 
     private String image;
 
-    private Time timeLimit;
+    private LocalTime timeLimit;
 
     @NotNull(message = "Field should contains user Id!")
     private Long userId;
