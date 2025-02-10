@@ -50,7 +50,7 @@ public class SecurityConfig {
 //                        loginPage("/oauth2/authorization/google").
                         successHandler(oAuth2LoginSuccessHandler)).
                 authorizeHttpRequests(request ->
-                        request.requestMatchers("/","/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home", "/api/**","/oauth2/**","/getCookie").permitAll().
+                        request.requestMatchers("/","/swagger-ui/**", "/v3/api-docs/**", "/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home", "/api/**", "/oauth2/**","/getCookie").permitAll().
                                 requestMatchers("/admin/**").hasAuthority(Role.ADMIN.getAuthority()).
                                 anyRequest().authenticated()).
                 logout(e -> e

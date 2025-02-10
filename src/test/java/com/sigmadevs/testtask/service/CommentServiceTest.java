@@ -12,7 +12,7 @@ import com.sigmadevs.testtask.app.mapper.CommentMapper;
 import com.sigmadevs.testtask.app.repository.CommentRepository;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.service.CommentService;
-import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

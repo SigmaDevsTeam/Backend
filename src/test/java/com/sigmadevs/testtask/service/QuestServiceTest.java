@@ -9,7 +9,7 @@ import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.service.QuestService;
-import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

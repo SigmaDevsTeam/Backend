@@ -8,7 +8,7 @@ import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
-import com.sigmadevs.testtask.security.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import com.sigmadevs.testtask.security.service.ImageService;
 import jakarta.transaction.Transactional;
