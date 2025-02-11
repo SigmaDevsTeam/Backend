@@ -16,6 +16,7 @@ public interface OptionMapper {
     @Mapping(target = "task", source = "task")
     Option toEntity(CreateOptionDTO createOptionDTO, Task task);
     @Mapping(source = "task", target = "taskDTO")
+//    @Mapping(source = "options", target = "options")
     OptionDTO toDTO(Option option);
     @Mapping(source = "task", target = "taskDTO")
     List<OptionDTO> toDTOList(List<Option> options);

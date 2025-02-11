@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "task")
 @Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

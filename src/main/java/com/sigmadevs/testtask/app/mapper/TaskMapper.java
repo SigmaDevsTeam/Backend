@@ -14,8 +14,12 @@ public interface TaskMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "createTaskDTO.title", target = "title")
     @Mapping(target = "quest", source = "quest")
+    @Mapping(source = "createTaskDTO.image", target = "image")
+    @Mapping(target = "createTaskDTO.options", ignore = true)
+//    @Mapping(source = "options", target = "options")
     Task toEntity(CreateTaskDTO createTaskDTO, Quest quest);
     @Mapping(source = "quest", target = "questDTO")
+    @Mapping(source = "options", target = "options")
     TaskDTO toDTO(Task task);
     @Mapping(source = "quest", target = "questDTO")
     List<TaskDTO> toDTOList(List<Task> tasks);

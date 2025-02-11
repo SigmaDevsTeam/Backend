@@ -13,7 +13,7 @@ public class UpdateTaskDTO {
 
     @NotNull(message = "Field should contains Id!")
     private Long id;
-    @NotBlank(message = "Field should contains title!")
+//    @NotBlank(message = "Field should contains title!")
     private String title;
     private String audio;
     private String video;

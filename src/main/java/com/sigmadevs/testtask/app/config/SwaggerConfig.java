@@ -14,7 +14,7 @@ public class SwaggerConfig  {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url("https://localhost:443")))
+                .servers(List.of(new Server().url("http://13.60.43.26:80")))
                 .info(new Info()
                         .title("Test task API")
                         .version("1.0.0"));

@@ -96,14 +96,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errors;
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Throwable.class)
-    public ApiError handleThrowable(Throwable e) {
-
-        log.error("An unexpected error occurred: {}", e.getMessage());
-
-        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
-    }
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(Throwable.class)
+//    public ApiError handleThrowable(Throwable e) {
+//
+//        log.error("An unexpected error occurred: {}", e.getMessage());
+//
+//        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
+//    }
 
 }

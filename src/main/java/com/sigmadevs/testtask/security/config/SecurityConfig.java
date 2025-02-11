@@ -6,8 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,7 +24,7 @@ public class SecurityConfig {
 
     private final UserService userService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final JwtCookieFilter jwtFilter;
+    private final JwtFilter jwtFilter;
 
 
     @Value("${spring.security.front-end-redirect-url-sign-in}")
@@ -50,7 +52,10 @@ public class SecurityConfig {
 //                        loginPage("/oauth2/authorization/google").
                         successHandler(oAuth2LoginSuccessHandler)).
                 authorizeHttpRequests(request ->
-                        request.requestMatchers("/","/swagger-ui/**", "/v3/api-docs/**", "/avatars/**", "/logout", "/login", "/registration", "/static/**", "/home", "/api/**", "/oauth2/**","/getCookie").permitAll().
+                        request.
+                                requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/avatars/**", "/logout", "/login/**", "/registration", "/static/**", "/api/**", "/oauth2/**").permitAll().
+                                requestMatchers(HttpMethod.GET,"/api/**").permitAll().
+                                requestMatchers("/api/**").authenticated().
                                 requestMatchers("/admin/**").hasAuthority(Role.ADMIN.getAuthority()).
                                 anyRequest().authenticated()).
                 logout(e -> e
@@ -63,14 +68,14 @@ public class SecurityConfig {
                         })
                 ).
                 userDetailsService(userService).
-                requiresChannel(channel ->
-                channel.anyRequest().requiresSecure()).
+//                requiresChannel(channel ->
+//                channel.anyRequest().requiresSecure()).
                 addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).
                 build();
     }
 
 //    @Bean
 //    public CookieSameSiteSupplier applicationCookieSameSiteSupplier() {
-//        return CookieSameSiteSupplier.ofNone();
+//        return CookieSameSiteSupplier.ofLax();
 //    }
 }

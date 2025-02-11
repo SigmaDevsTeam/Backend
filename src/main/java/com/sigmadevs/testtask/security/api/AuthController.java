@@ -25,13 +25,14 @@ public class AuthController {
     private final UserService userService;
     private final UserMapper userMapper;
 
+
     @PostMapping("/login")
-    public ResponseEntity<UserGetDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDto userLoginDto) {
         return authService.login(userLoginDto);
     }
 
     @PostMapping(value = "/registration",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserGetDto> registration(@RequestPart(required = false) MultipartFile image,
+    public ResponseEntity<String> registration(@RequestPart(required = false) MultipartFile image,
                                                 @RequestPart(value = "user") @Valid  UserRegistrationDto userRegistrationDto) {
 
         return authService.registration(userRegistrationDto, image);
@@ -42,11 +43,11 @@ public class AuthController {
         return ResponseEntity.ok(userMapper.userToUserGetDto(userService.findByUsername(principal.getName())));
     }
 
-    @PostMapping("/getCookie")
-    public ResponseEntity<String> getCookie(HttpServletResponse response,@RequestBody String jwt) {
-        response.addCookie(authService.createCookie(jwt));
-        return ResponseEntity.ok("Success");
-    }
+//    @PostMapping("/getCookie")
+//    public ResponseEntity<String> getCookie(HttpServletResponse response,@RequestBody String jwt) {
+//        response.addCookie(authService.createCookie(jwt));
+//        return ResponseEntity.ok("Success");
+//    }
 }
 
 

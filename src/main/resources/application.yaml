@@ -1,5 +1,5 @@
 spring:
   profiles:
     active: dev
-  config:
-    import: file:.env[.properties]
+#  config:
+#    import: file:.env[.properties]

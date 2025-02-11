@@ -11,12 +11,17 @@ import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import com.sigmadevs.testtask.security.service.ImageService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -32,41 +37,49 @@ public class QuestService {
 
     private final QuestMapper questMapper;
 
-    public QuestDTO createQuest(CreateQuestDTO createQuestDTO, MultipartFile image) {
+    public QuestDTO createQuest(CreateQuestDTO createQuestDTO, MultipartFile image,Principal principal) {
         log.info("Creating a new quest with title: {}", createQuestDTO.getTitle());
+        User user1 = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
 
-        User user = userRepository.findById(createQuestDTO.getUserId())
-                .orElseThrow(() -> {
-                    log.error("User with ID {} not found", createQuestDTO.getUserId());
-                    return new UserNotFoundException("User with " + createQuestDTO.getUserId() + " Id not found!");
-                });
         String imageUrl = imageService.uploadImage("quest", image);
         createQuestDTO.setImage(imageUrl);
-        Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user));
+        Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user1));
         log.info("Quest created successfully with ID: {}", quest.getId());
         return questMapper.toDTO(quest);
     }
 
     @Transactional
-    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO,MultipartFile image) {
+    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO,MultipartFile image,Principal principal) {
         log.info("Updating quest with ID: {}", updateQuestDTO.getId());
         Quest quest = questRepository.findById(updateQuestDTO.getId())
                 .orElseThrow(() -> {
                     log.error("Quest with ID {} not found", updateQuestDTO.getId());
                     return new QuestNotFoundException("Quest with Id " + updateQuestDTO.getId() + " not found!");
                 });
+        if (quest.getUser().getUsername().equals(principal.getName())) {
 
-        quest.setTitle(updateQuestDTO.getTitle());
-        quest.setDescription(updateQuestDTO.getDescription());
-//        quest.setImage(updateQuestDTO.getImage());
-        if (image!=null) {
-            String url = imageService.updateImage(quest.getImage(), image);
-            quest.setImage(url);
-        }else quest.setImage(null);
-        quest.setTimeLimit(updateQuestDTO.getTimeLimit());
+            quest.setTitle(updateQuestDTO.getTitle()!=null?updateQuestDTO.getTitle():quest.getTitle());
+            quest.setDescription(updateQuestDTO.getDescription());
+            if (image!=null) {
+                String url = imageService.updateImage(quest.getImage(), image);
+                quest.setImage(url);
+            }
+            quest.setTimeLimit(updateQuestDTO.getTimeLimit());
 
-        log.info("Quest with ID {} updated successfully", updateQuestDTO.getId());
-        return questMapper.toDTO(quest);
+            log.info("Quest with ID {} updated successfully", updateQuestDTO.getId());
+            return questMapper.toDTO(quest);
+        }else {
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
+                    .getRequestAttributes())
+                    .getResponse();
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            try {
+                response.getWriter().write("Forbidden");
+                return null;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public List<QuestDTO> getAllQuests() {
@@ -87,13 +100,22 @@ public class QuestService {
         return questMapper.toDTO(quest);
     }
 
-    public void removeQuestById(long id) {
+    public void removeQuestById(long id, Principal principal) {
         log.info("Attempting to delete quest with ID: {}", id);
-        if (!questRepository.existsById(id)) {
-            log.error("Quest with ID {} not found", id);
-            throw new QuestNotFoundException("Quest with Id " + id + " not found!");
+        Quest quest = questRepository.findById(id).orElseThrow(() -> new QuestNotFoundException("Quest with Id " + id + " not found!"));
+        if (quest.getUser().getUsername().equals(principal.getName())) {
+            questRepository.deleteById(id);
+            log.info("Quest with ID {} deleted successfully", id);
+        }else {
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes())
+                .getResponse();
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            try {
+                response.getWriter().write("Forbidden");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        questRepository.deleteById(id);
-        log.info("Quest with ID {} deleted successfully", id);
     }
 }

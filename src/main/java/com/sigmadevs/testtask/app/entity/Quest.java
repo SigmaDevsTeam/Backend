@@ -39,6 +39,8 @@ public class Quest {
     private Float rating;
 
     @OneToMany(mappedBy = "quest", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ToString.Exclude
     private List<Task> tasks;
 
     @OneToMany(mappedBy = "quest", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)

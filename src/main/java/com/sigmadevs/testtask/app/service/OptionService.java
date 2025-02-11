@@ -29,13 +29,13 @@ public class OptionService {
 
     private final TaskRepository taskRepository;
 
-    public OptionDTO createOption(CreateOptionDTO createOptionDTO) {
+    public OptionDTO createOption(CreateOptionDTO createOptionDTO,Long taskId) {
         log.info("Creating new option with title: {}", createOptionDTO.getTitle());
 
-        Task task = taskRepository.findById(createOptionDTO.getTaskId())
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> {
-                    log.warn("Task with ID {} not found!", createOptionDTO.getTaskId());
-                    return new TaskNotFoundException("Task with Id " + createOptionDTO.getTaskId() + " not found!");
+                    log.warn("Task with ID {} not found!", taskId);
+                    return new TaskNotFoundException("Task with Id " + taskId + " not found!");
                 });
 
         Option option = optionRepository.save(optionMapper.toEntity(createOptionDTO, task));
@@ -90,4 +90,14 @@ public class OptionService {
         log.info("Option with ID {} removed successfully", id);
     }
 
+    public void createAllOptions(List<CreateOptionDTO> options, Task task) {
+        try{
+
+            List<Option> list = options.stream().map(e -> optionMapper.toEntity(e, task)).toList();
+            optionRepository.saveAll(list);
+        }catch (Exception e){
+            log.error("Error while creating all options", e);
+            throw new RuntimeException(e); //TODO
+        }
+    }
 }

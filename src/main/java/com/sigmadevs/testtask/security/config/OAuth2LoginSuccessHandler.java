@@ -78,8 +78,6 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                                 oauthUser.getAuthorities(),
                                 oAuth2AuthenticationToken.getAuthorizedClientRegistrationId()
                         );
-//                        Cookie cookie = authService.createCookie(jwtUtils.generateToken(user));
-//                        response.addCookie(cookie);
                         SecurityContextHolder.getContext().setAuthentication(securityAuth);
                     }, () -> {
                         User newUser = new User();
@@ -101,11 +99,8 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                         SecurityContextHolder.getContext().setAuthentication(securityAuth);
                     });
             User user = main.get();
-//            Cookie cookie = authService.createCookie(jwtUtils.generateToken(user));
-//            response.addCookie(cookie);
             this.setAlwaysUseDefaultTargetUrl(true);
-            this.setDefaultTargetUrl(frontendUrl+"?jwt="+jwtUtils.generateToken(user));
-//            getRedirectStrategy().sendRedirect(request, response, frontendUrl);
+            this.setDefaultTargetUrl(frontendUrl+"?code="+jwtUtils.generateToken(user));
             super.onAuthenticationSuccess(request, response, authentication);
         }
     }

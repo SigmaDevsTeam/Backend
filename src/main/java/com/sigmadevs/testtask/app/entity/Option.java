@@ -1,5 +1,6 @@
 package com.sigmadevs.testtask.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Table(name = "option")
 public class Option {
     @Id
@@ -23,5 +25,7 @@ public class Option {
     
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "task_id", nullable = false)
+    @ToString.Exclude
+    @JsonIgnore
     private Task task;
 }

@@ -106,7 +106,7 @@ public class UserService implements UserDetailsService {
 
         try{
             userRepository.deleteById(id);
-            deleteCookie();
+//            deleteCookie();
             return true;
         }catch (Exception e) {
             log.debug(e.getMessage());
@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
     public boolean deleteByUsername(@NotNull String username) {
         try{
             userRepository.deleteByUsername(username);
-            deleteCookie();
+//            deleteCookie();
             return true;
         }catch (Exception e) {
             log.debug(e.getMessage());
@@ -130,7 +130,7 @@ public class UserService implements UserDetailsService {
     public boolean deleteByEmail(@NotNull String email) {
         try{
             userRepository.deleteByEmail(email);
-            deleteCookie();
+//            deleteCookie();
             return true;
         }catch (Exception e) {
             log.debug(e.getMessage());
@@ -138,12 +138,12 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    private static void deleteCookie() {
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes())
-                .getResponse();
-        response.setHeader("Set-Cookie", "accessToken=unauthorized;expires=Thu, 01 Jan 1970 00:00:01 GMT;");
-    }
+//    private static void deleteCookie() {
+//        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
+//                .getRequestAttributes())
+//                .getResponse();
+//        response.setHeader("Set-Cookie", "accessToken=unauthorized;expires=Thu, 01 Jan 1970 00:00:01 GMT;");
+//    }
     @Transactional
     public UserGetDto updateImage(@NotNull MultipartFile image, Principal principal) {
         User user = findByUsername(principal.getName());

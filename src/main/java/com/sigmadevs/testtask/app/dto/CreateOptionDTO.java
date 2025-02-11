@@ -18,7 +18,7 @@ public class CreateOptionDTO {
     @NotNull(message = "Option should be true or false!")
     private Boolean isTrue;
 
-    @NotNull(message = "Field should contains task Id!")
-    private Long taskId;
+//    @NotNull(message = "Field should contains task Id!")
+//    private Long taskId;
 
 }

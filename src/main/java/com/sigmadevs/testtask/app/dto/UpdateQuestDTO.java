@@ -16,10 +16,8 @@ public class UpdateQuestDTO {
 
     @NotNull(message = "Field should contains Id!")
     private Long id;
-    @NotNull(message = "Field should contains title!")
     private String title;
     private String description;
-    private String image;
     private LocalTime timeLimit;
 
 }

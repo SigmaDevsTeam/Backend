@@ -28,7 +28,7 @@ public class AuthService {
     @Value("front-end-url")
     private String cors;
 
-    public ResponseEntity<UserGetDto> login(UserLoginDto userLoginDto) {
+    public ResponseEntity<String> login(UserLoginDto userLoginDto) {
         String login = userLoginDto.getLogin();
         User user;
         user = userService.findByEmailOptional(login).orElse(null);
@@ -39,31 +39,30 @@ public class AuthService {
             throw new RuntimeException("User not found");
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),userLoginDto.getPassword()));
-        setCookie(user);
-        return ResponseEntity.ok(userMapper.userToUserGetDto(user));
+
+        return ResponseEntity.ok(jwtUtil.generateToken(user));
     }
 
-    public ResponseEntity<UserGetDto> registration(UserRegistrationDto userRegistrationDto, MultipartFile image) {
+    public ResponseEntity<String> registration(UserRegistrationDto userRegistrationDto, MultipartFile image) {
         User user = userService.save(userMapper.userRegistrationDtoToUser(userRegistrationDto), image);
-        setCookie(user);
-        return ResponseEntity.ok(userMapper.userToUserGetDto(user));
+        return ResponseEntity.ok(jwtUtil.generateToken(user));
     }
 
-    private void setCookie(User user) {
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes())
-                .getResponse();
-        Cookie cookie = createCookie(jwtUtil.generateToken(user));
-        response.addCookie(cookie);
-    }
+//    private void setCookie(User user) {
+//        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
+//                .getRequestAttributes())
+//                .getResponse();
+//        Cookie cookie = createCookie(jwtUtil.generateToken(user));
+//        response.addCookie(cookie);
+//    }
 
-    public Cookie createCookie(String jwt) {
-        Cookie cookie = new Cookie("accessToken", jwt);
-        cookie.setMaxAge(24_192_000);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-//        cookie.setDomain("taupe-raindrop-f35bc9.netlify.app");
-        return cookie;
-    }
+//    public Cookie createCookie(String jwt) {
+//        Cookie cookie = new Cookie("accessToken", jwt);
+//        cookie.setMaxAge(24_192_000);
+//        cookie.setPath("/");
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+////        cookie.setDomain("taupe-raindrop-f35bc9.netlify.app");
+//        return cookie;
+//    }
 }

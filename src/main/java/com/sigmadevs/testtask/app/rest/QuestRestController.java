@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -21,16 +22,16 @@ public class QuestRestController {
     private final QuestService questService;
 
     @PostMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public QuestDTO createQuest(@RequestPart @Valid CreateQuestDTO quest, @RequestPart(required = false) MultipartFile image) {
-        return questService.createQuest(quest,image);
+//    @ResponseStatus(HttpStatus.CREATED)
+    public QuestDTO createQuest(@RequestPart @Valid CreateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
+        return questService.createQuest(quest,image,principal);
     }
 
     //TODO
     @PutMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public QuestDTO updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image) {
-        return questService.updateQuest(quest,image);
+//    @ResponseStatus(HttpStatus.OK)
+    public QuestDTO updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
+        return questService.updateQuest(quest,image,principal);
     }
 
     @GetMapping("/quests")
@@ -46,9 +47,9 @@ public class QuestRestController {
     }
 
     @DeleteMapping("/quests/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeQuestById(@PathVariable("id") Long id) {
-        questService.removeQuestById(id);
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeQuestById(@PathVariable("id") Long id, Principal principal) {
+        questService.removeQuestById(id,principal);
     }
 
 }

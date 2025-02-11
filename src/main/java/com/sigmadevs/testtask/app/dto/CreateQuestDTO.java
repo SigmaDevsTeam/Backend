@@ -24,8 +24,4 @@ public class CreateQuestDTO {
 
     private LocalTime timeLimit;
 
-    @NotNull(message = "Field should contains user Id!")
-    private Long userId;
-
-
 }

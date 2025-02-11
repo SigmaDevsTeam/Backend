@@ -62,12 +62,12 @@ springdoc:
     enabled: true
 
 server:
-#  ssl:
-#    key-store: classpath:keystore/test.p12
-#    key-store-password: javalover
-#    key-store-type: pkcs12
-#    key-alias: test
-#    key-password: javalover
+  #  ssl:
+  #    key-store: classpath:keystore/test.p12
+  #    key-store-password: javalover
+  #    key-store-type: pkcs12
+  #    key-alias: test
+  #    key-password: javalover
   port: 80
 
 logging:

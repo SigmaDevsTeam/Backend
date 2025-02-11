@@ -25,5 +25,7 @@ public class TaskDTO {
 
     private QuestDTO questDTO;
 
+    private List<OptionDTO> options;
+
 
 }
