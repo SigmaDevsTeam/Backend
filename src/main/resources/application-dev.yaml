@@ -24,6 +24,7 @@ spring:
       client:
         registration:
 
+
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
@@ -61,16 +62,17 @@ springdoc:
     enabled: true
 
 server:
-  ssl:
-    key-store: classpath:keystore/test.p12
-    key-store-password: javalover
-    key-store-type: pkcs12
-    key-alias: test
-    key-password: javalover
-  port: 443
+#  ssl:
+#    key-store: classpath:keystore/test.p12
+#    key-store-password: javalover
+#    key-store-type: pkcs12
+#    key-alias: test
+#    key-password: javalover
+  port: 80
 
 logging:
   level:
-#    org.springframework.security.web: debug
-    org.springframework.web: debug
-    com.sigmadevs.testtask: debug
+
+    org.springframework.security: debug
+#    com.sigmadevs.testtask: debug
+#    org.springframework.web: debug
