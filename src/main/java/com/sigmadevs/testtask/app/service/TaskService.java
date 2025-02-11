@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,14 +42,15 @@ public class TaskService {
 
     public TaskDTO createTask(CreateTaskDTO createTaskDTO, MultipartFile image,MultipartFile video,MultipartFile audio,Principal principal) {
         log.info("Creating task with title: {}", createTaskDTO.getTitle());
-        User user1 = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
 
         Quest quest = questRepository.findById(createTaskDTO.getQuestId())
                 .orElseThrow(() -> {
                     log.error("Quest with ID {} not found", createTaskDTO.getQuestId());
                     return new QuestNotFoundException("Quest with Id " + createTaskDTO.getQuestId() + " not found!");
                 });
-        if(quest.getUser().getUsername().equals(user1.getUsername())) {
+
+        if(quest.getUser().getUsername().equals(user.getUsername())) {
             if (image!=null){
                 String uploadedImage = imageService.uploadImage("task/image", image);
                 createTaskDTO.setImage(uploadedImage);
@@ -59,8 +61,11 @@ public class TaskService {
                 String uploadedAudio = imageService.uploadImage("task/audio", audio);
                 createTaskDTO.setAudio(uploadedAudio);
             }
+
+            incrementTaskCount(quest);
+
             Task task = taskRepository.save(taskMapper.toEntity(createTaskDTO, quest));
-            optionService.createAllOptions(createTaskDTO.getOptions(),task);
+            optionService.createOptions(createTaskDTO.getOptions(),task);
             log.info("Task created with ID: {}", task.getId());
             return taskMapper.toDTO(task);
         }else {
@@ -118,24 +123,17 @@ public class TaskService {
         }
 
     }
-    public List<TaskDTO> getAllTasks() {
-        log.info("Fetching all tasks...");
-        List<Task> tasks = taskRepository.findAll();
-        log.info("Retrieved {} tasks", tasks.size());
-        return taskMapper.toDTOList(tasks);
-    }
+    public List<TaskDTO> getTasksByQuestId(Long questId) {
+        log.info("Fetching tasks for quest ID: {}", questId);
 
-    public TaskDTO getTaskById(long id) {
-        log.info("Fetching task with ID: {}", id);
+        List<TaskDTO> tasks = taskRepository.findAll().stream()
+                .filter(task -> task.getQuest().getId() == questId)
+                .map(taskMapper::toDTO)
+                .collect(Collectors.toList());
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Task with ID {} not found!", id);
-                    return new TaskNotFoundException("Task with Id " + id + " not found!");
-                });
+        log.info("Found {} tasks for quest ID: {}", tasks.size(), questId);
 
-        log.info("Retrieved task with ID {}: {}", task.getId(), task);
-        return taskMapper.toDTO(task);
+        return tasks;
     }
 
     public void removeTaskById(long id, Principal principal) {
@@ -155,12 +153,11 @@ public class TaskService {
                 throw new RuntimeException(e);
             }
         }
-
-
+    }
+    private void incrementTaskCount(Quest quest) {
+        Integer currentTaskCount = quest.getTaskCount();
+        quest.setTaskCount(currentTaskCount + 1);
+        questRepository.save(quest);
     }
 
-    public List<TaskDTO> getTasksById(Long id) {
-        List<Task> task = taskRepository.findTasksByQuest_Id(id);
-        return task.stream().map(taskMapper::toDTO).toList();
-    }
 }

@@ -3,8 +3,6 @@ package com.sigmadevs.testtask.app.exception;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -96,14 +95,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errors;
     }
 
-//    @ResponseBody
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(Throwable.class)
-//    public ApiError handleThrowable(Throwable e) {
-//
-//        log.error("An unexpected error occurred: {}", e.getMessage());
-//
-//        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
-//    }
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ApiError handleAccessDeniedException(AccessDeniedException e) {
+        return new ApiError(HttpStatus.FORBIDDEN.value(), e.getMessage());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Throwable.class)
+    public ApiError handleThrowable(Throwable e) {
+
+        log.error("An unexpected error occurred: {}", e.getMessage());
+
+        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
+    }
 
 }

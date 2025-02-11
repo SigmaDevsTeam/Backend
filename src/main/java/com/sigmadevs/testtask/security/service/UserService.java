@@ -1,12 +1,13 @@
 package com.sigmadevs.testtask.security.service;
 
+import com.sigmadevs.testtask.app.dto.UserDTO;
 import com.sigmadevs.testtask.app.entity.User;
-import com.sigmadevs.testtask.security.dto.UserGetDto;
 import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.app.exception.UsernameAlreadyExistsException;
+import com.sigmadevs.testtask.app.mapper.MainUserMapper;
+import com.sigmadevs.testtask.security.dto.UserGetDto;
 import com.sigmadevs.testtask.security.mapper.UserMapper;
 import com.sigmadevs.testtask.security.repository.UserRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,6 +25,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,11 +37,13 @@ public class UserService implements UserDetailsService {
     private final ImageService imageService;
     private final ServerProperties serverProperties;
     private final UserMapper userMapper;
+    private final MainUserMapper mainUserMapper;
 
     //get
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(user -> mainUserMapper.toDTO(user))
+                .collect(Collectors.toList());
     }
 
     public User findById(@NotNull Long id) {

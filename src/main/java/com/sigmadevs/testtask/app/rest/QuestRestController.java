@@ -22,32 +22,23 @@ public class QuestRestController {
     private final QuestService questService;
 
     @PostMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.CREATED)
     public QuestDTO createQuest(@RequestPart @Valid CreateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
         return questService.createQuest(quest,image,principal);
     }
 
-    //TODO
     @PutMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public QuestDTO updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
         return questService.updateQuest(quest,image,principal);
     }
-
     @GetMapping("/quests")
     @ResponseStatus(HttpStatus.OK)
-    public List<QuestDTO> getAllQuests() {
-        return questService.getAllQuests();
+    public List<QuestDTO> getAllQuests(Principal principal) {
+        return questService.getAllQuests(principal);
     }
-
-    @GetMapping("/quests/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public QuestDTO getQuestById(@PathVariable("id") Long id) {
-        return questService.getQuestById(id);
-    }
-
     @DeleteMapping("/quests/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeQuestById(@PathVariable("id") Long id, Principal principal) {
         questService.removeQuestById(id,principal);
     }
