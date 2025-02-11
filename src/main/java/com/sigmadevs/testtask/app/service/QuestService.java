@@ -6,9 +6,9 @@ import com.sigmadevs.testtask.app.dto.UpdateQuestDTO;
 import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
+import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.app.mapper.QuestMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
-import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.security.repository.UserRepository;
 import com.sigmadevs.testtask.security.service.ImageService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,11 +40,11 @@ public class QuestService {
 
     public QuestDTO createQuest(CreateQuestDTO createQuestDTO, MultipartFile image,Principal principal) {
         log.info("Creating a new quest with title: {}", createQuestDTO.getTitle());
-        User user1 = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
 
         String imageUrl = imageService.uploadImage("quest", image);
         createQuestDTO.setImage(imageUrl);
-        Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user1));
+        Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user));
         log.info("Quest created successfully with ID: {}", quest.getId());
         return questMapper.toDTO(quest);
     }
@@ -82,22 +83,17 @@ public class QuestService {
         }
     }
 
-    public List<QuestDTO> getAllQuests() {
+    public List<QuestDTO> getAllQuests(Principal principal) {
         log.info("Fetching all quests");
-        List<Quest> quests = questRepository.findAll();
+
+        String currentUsername = principal.getName();
+
+        List<Quest> quests = questRepository.findAll()
+                .stream().filter(quest -> quest.getUser().getUsername().equals(currentUsername))
+                .collect(Collectors.toList());
+
         log.info("Retrieved {} quests", quests.size());
         return questMapper.toDTOList(quests);
-    }
-
-    public QuestDTO getQuestById(Long id) {
-        log.info("Fetching quest with ID: {}", id);
-        Quest quest = questRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Quest with ID {} not found", id);
-                    return new QuestNotFoundException("Quest with Id " + id + " not found!");
-                });
-        log.info("Quest with ID {} retrieved successfully", id);
-        return questMapper.toDTO(quest);
     }
 
     public void removeQuestById(long id, Principal principal) {

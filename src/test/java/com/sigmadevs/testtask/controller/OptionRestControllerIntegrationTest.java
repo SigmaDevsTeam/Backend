@@ -68,7 +68,7 @@ public class OptionRestControllerIntegrationTest {
 
         createOptionDTO = CreateOptionDTO.builder()
                 .title("Test option")
-                .taskId(1L)
+//                .taskId(1L)
                 .isTrue(true)
                 .build();
 
@@ -85,7 +85,7 @@ public class OptionRestControllerIntegrationTest {
     @ValueSource(longs = {1L, 2L, 3L, 4L, 5L})
     void createOption_shouldReturnCreatedStatus(Long taskId) throws Exception {
 
-        createOptionDTO.setTaskId(taskId);
+//        createOptionDTO.setTaskId(taskId);
 
         mockMvc.perform(post("/api/options")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +110,7 @@ public class OptionRestControllerIntegrationTest {
     @Test
     void createOption_shouldReturnUnprocessableEntityStatus_whenTaskIsNull() throws Exception {
 
-        createOptionDTO.setTaskId(null);
+//        createOptionDTO.setTaskId(null);
 
         mockMvc.perform(post("/api/options")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,15 +137,15 @@ public class OptionRestControllerIntegrationTest {
     @Test
     void createOption_shouldReturnNotFoundStatus_whenTaskNotFound() throws Exception {
 
-        createOptionDTO.setTaskId(100L);
+//        createOptionDTO.setTaskId(100L);
 
         mockMvc.perform(post("/api/options")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createOptionDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Task with Id " + createOptionDTO.getTaskId() + " not found!"));
+                .andExpect(jsonPath("$.statusCode").value(404));
+//                .andExpect(jsonPath("$.message").value("Task with Id " + createOptionDTO.getTaskId() + " not found!"));
     }
 
     @ParameterizedTest

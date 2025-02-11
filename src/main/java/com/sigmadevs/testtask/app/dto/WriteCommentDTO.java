@@ -9,11 +9,11 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCommentDTO {
+public class WriteCommentDTO {
+
     @NotBlank(message = "Field should contains title!")
     private String title;
-    @NotNull(message = "Field should contains user Id!")
-    private Long userId;
+
     @NotNull(message = "Field should contains quest Id!")
     private Long questId;
 

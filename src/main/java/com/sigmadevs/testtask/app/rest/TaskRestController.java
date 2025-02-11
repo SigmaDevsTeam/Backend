@@ -21,35 +21,22 @@ public class TaskRestController {
 
     private final TaskService taskService;
     @PostMapping(value = "/tasks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO createTask(@RequestPart @Valid CreateTaskDTO task, Principal principal,@RequestPart(required = false) MultipartFile image,@RequestPart(required = false) MultipartFile video,@RequestPart(required = false) MultipartFile audio) {
         return taskService.createTask(task,image,video,audio,principal);
     }
     @PutMapping(value = "/tasks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public TaskDTO updateTask(@RequestPart @Valid UpdateTaskDTO task,Principal principal,@RequestPart(required = false) MultipartFile image,@RequestPart(required = false) MultipartFile video,@RequestPart(required = false) MultipartFile audio) {
         return taskService.updateTask(task,image,video,audio,principal);
     }
-    @GetMapping("/tasks")
+    @GetMapping("/tasks/{questId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskDTO> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<TaskDTO> getTasksByQuestId(@PathVariable("id") Long questId) {
+        return taskService.getTasksByQuestId(questId);
     }
-
-    @GetMapping("/task/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public TaskDTO getTaskById(@PathVariable("id") Long id) {
-        return taskService.getTaskById(id);
-    }
-
-    @GetMapping("/tasks/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<TaskDTO> getTasksById(@PathVariable("id") Long id) {
-        return taskService.getTasksById(id);
-    }
-
     @DeleteMapping("/tasks/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTaskById(@PathVariable("id") Long id, Principal principal) {
         taskService.removeTaskById(id,principal);
     }

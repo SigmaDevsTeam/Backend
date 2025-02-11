@@ -2,8 +2,8 @@ package com.sigmadevs.testtask.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigmadevs.testtask.app.dto.CommentDTO;
-import com.sigmadevs.testtask.app.dto.CreateCommentDTO;
-import com.sigmadevs.testtask.app.dto.UpdateCommentDTO;
+import com.sigmadevs.testtask.app.dto.WriteCommentDTO;
+import com.sigmadevs.testtask.app.dto.EditCommentDTO;
 import com.sigmadevs.testtask.app.entity.Comment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,8 @@ public class CommentRestControllerIntegrationTest {
 
     Comment comment;
     CommentDTO commentDTO;
-    CreateCommentDTO createCommentDTO;
-    UpdateCommentDTO updateCommentDTO;
+    WriteCommentDTO writeCommentDTO;
+    EditCommentDTO editCommentDTO;
 
     @BeforeEach
     void setUp() {
@@ -65,13 +65,13 @@ public class CommentRestControllerIntegrationTest {
                 .title("Test comment")
                 .build();
 
-        createCommentDTO = CreateCommentDTO.builder()
+        writeCommentDTO = WriteCommentDTO.builder()
                 .title("Test comment")
-                .userId(1L)
+//                .userId(1L)
                 .questId(1L)
                 .build();
 
-        updateCommentDTO = UpdateCommentDTO.builder()
+        editCommentDTO = EditCommentDTO.builder()
                 .id(1L)
                 .title("Updated comment")
                 .build();
@@ -82,22 +82,22 @@ public class CommentRestControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L})
     void createComment_shouldReturnCreatedStatus(Long userId) throws Exception {
-        createCommentDTO.setUserId(userId);
+//        writeCommentDTO.setUserId(userId);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.length()").value(4));
     }
 
     @Test
     void createComment_shouldReturnUnprocessableEntityStatus_whenTitleIsNull() throws Exception {
-        createCommentDTO.setTitle(null);
+        writeCommentDTO.setTitle(null);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(422))
@@ -106,11 +106,11 @@ public class CommentRestControllerIntegrationTest {
 
     @Test
     void createComment_shouldReturnUnprocessableEntityStatus_whenUserIdIsNull() throws Exception {
-        createCommentDTO.setUserId(null);
+//        writeCommentDTO.setUserId(null);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(422))
@@ -119,11 +119,11 @@ public class CommentRestControllerIntegrationTest {
 
     @Test
     void createComment_shouldReturnUnprocessableEntityStatus_whenQuestIdIsNull() throws Exception {
-        createCommentDTO.setQuestId(null);
+        writeCommentDTO.setQuestId(null);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(422))
@@ -132,50 +132,50 @@ public class CommentRestControllerIntegrationTest {
 
     @Test
     void createComment_shouldReturnNotFoundStatus_whenUserNotFound() throws Exception {
-        createCommentDTO.setUserId(100L);
+//        writeCommentDTO.setUserId(100L);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("User with " + createCommentDTO.getUserId() + " Id not found!"));
+                .andExpect(jsonPath("$.statusCode").value(404));
+//                .andExpect(jsonPath("$.message").value("User with " + writeCommentDTO.getUserId() + " Id not found!"));
     }
 
     @Test
     void createComment_shouldReturnNotFoundStatus_whenQuestNotFound() throws Exception {
-        createCommentDTO.setQuestId(100L);
+        writeCommentDTO.setQuestId(100L);
 
         mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCommentDTO)))
+                        .content(objectMapper.writeValueAsString(writeCommentDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Quest with Id " + createCommentDTO.getQuestId() + " not found!"));
+                .andExpect(jsonPath("$.message").value("Quest with Id " + writeCommentDTO.getQuestId() + " not found!"));
     }
 
 
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L})
     void updateComment_shouldReturnOkStatus(Long id) throws Exception {
-        updateCommentDTO.setId(id);
+        editCommentDTO.setId(id);
 
         mockMvc.perform(put("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCommentDTO)))
+                        .content(objectMapper.writeValueAsString(editCommentDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(4));
     }
 
     @Test
     void updateComment_shouldReturnUnprocessableEntityStatus_whenIdIsNull() throws Exception {
-        updateCommentDTO.setId(null);
+        editCommentDTO.setId(null);
 
         mockMvc.perform(put("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCommentDTO)))
+                        .content(objectMapper.writeValueAsString(editCommentDTO)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(422))
@@ -184,11 +184,11 @@ public class CommentRestControllerIntegrationTest {
 
     @Test
     void updateComment_shouldReturnUnprocessableEntityStatus_whenTitleIsNull() throws Exception {
-        updateCommentDTO.setTitle(null);
+        editCommentDTO.setTitle(null);
 
         mockMvc.perform(put("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCommentDTO)))
+                        .content(objectMapper.writeValueAsString(editCommentDTO)))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(422))
@@ -197,15 +197,15 @@ public class CommentRestControllerIntegrationTest {
 
     @Test
     void updateComment_shouldReturnNotFoundStatus_whenCommentNotFound() throws Exception {
-        updateCommentDTO.setId(100L);
+        editCommentDTO.setId(100L);
 
         mockMvc.perform(put("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCommentDTO)))
+                        .content(objectMapper.writeValueAsString(editCommentDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Comment with Id " + updateCommentDTO.getId() + " not found!"));
+                .andExpect(jsonPath("$.message").value("Comment with Id " + editCommentDTO.getId() + " not found!"));
     }
 
     @ParameterizedTest

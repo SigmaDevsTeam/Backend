@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class UpdateCommentDTO {
+public class EditCommentDTO {
 
     @NotNull(message = "Field should contains Id!")
     private Long id;
