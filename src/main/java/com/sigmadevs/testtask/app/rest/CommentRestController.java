@@ -1,13 +1,16 @@
 package com.sigmadevs.testtask.app.rest;
 
 import com.sigmadevs.testtask.app.dto.CommentDTO;
-import com.sigmadevs.testtask.app.dto.CreateCommentDTO;
-import com.sigmadevs.testtask.app.dto.UpdateCommentDTO;
+import com.sigmadevs.testtask.app.dto.EditCommentDTO;
+import com.sigmadevs.testtask.app.dto.WriteCommentDTO;
 import com.sigmadevs.testtask.app.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,23 +20,23 @@ public class CommentRestController {
     private final CommentService commentService;
     @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDTO createComment(@RequestBody @Valid CreateCommentDTO createCommentDTO) {
-        return commentService.createComment(createCommentDTO);
+    public CommentDTO writeComment(@RequestBody @Valid WriteCommentDTO writeCommentDTO, Principal principal) {
+        return commentService.writeComment(writeCommentDTO, principal);
     }
     @PutMapping("/comments")
     @ResponseStatus(HttpStatus.OK)
-    public CommentDTO updateComment(@RequestBody @Valid UpdateCommentDTO updateCommentDTO) {
-        return commentService.updateComment(updateCommentDTO);
+    public CommentDTO editComment(@RequestBody @Valid EditCommentDTO editCommentDTO, Principal principal) {
+        return commentService.editComment(editCommentDTO, principal);
     }
-    @GetMapping("/comments/{id}")
+    @GetMapping("/comments/{questId}")
     @ResponseStatus(HttpStatus.OK)
-    public CommentDTO getCommentById(@PathVariable("id") Long id) {
-        return commentService.getCommentById(id);
+    public List<CommentDTO> getCommentsByQuestId(@PathVariable("questId") Long questId) {
+        return  commentService.getCommentsByQuestId(questId);
     }
     @DeleteMapping("/comments/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeCommentById(@PathVariable("id") Long id) {
-        commentService.removeCommentById(id);
+    public void removeCommentById(@PathVariable("id") Long id, Principal principal) {
+        commentService.removeCommentById(id, principal);
     }
 
 }

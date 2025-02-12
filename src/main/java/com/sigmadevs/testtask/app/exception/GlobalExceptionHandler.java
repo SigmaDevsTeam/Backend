@@ -3,13 +3,12 @@ package com.sigmadevs.testtask.app.exception;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -95,21 +94,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
         return errors;
     }
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(RuntimeException.class)
-//    public ApiError handleRuntime(RuntimeException e) {
-//        return new ApiError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-//
-//    }
 
-//    @ResponseBody
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(Throwable.class)
-//    public ApiError handleThrowable(Throwable e) {
-//
-//        log.error("An unexpected error occurred: {}", e.getMessage());
-//
-//        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
-//    }
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ApiError handleAccessDeniedException(AccessDeniedException e) {
+        return new ApiError(HttpStatus.FORBIDDEN.value(), e.getMessage());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Throwable.class)
+    public ApiError handleThrowable(Throwable e) {
+
+        log.error("An unexpected error occurred: {}", e.getMessage());
+
+        return new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred: " + e.getMessage());
+    }
 
 }
