@@ -1,6 +1,8 @@
 package com.sigmadevs.testtask.security.service;
 
 import com.sigmadevs.testtask.app.entity.User;
+import com.sigmadevs.testtask.app.repository.RoomRepository;
+import com.sigmadevs.testtask.app.service.RoomService;
 import com.sigmadevs.testtask.security.dto.UserGetDto;
 import com.sigmadevs.testtask.app.exception.UserNotFoundException;
 import com.sigmadevs.testtask.app.exception.UsernameAlreadyExistsException;
@@ -37,6 +39,7 @@ public class UserService implements UserDetailsService {
     private final ImageService imageService;
     private final ServerProperties serverProperties;
     private final UserMapper userMapper;
+    private final RoomRepository roomRepository;
 
     //get
 
@@ -85,6 +88,8 @@ public class UserService implements UserDetailsService {
     public User save(@NotNull User newUser, MultipartFile image) {
         if (userRepository.existsUserByUsername(newUser.getUsername())) {
             throw new UsernameAlreadyExistsException("Username already exists");
+        }if (userRepository.existsUserByEmail(newUser.getEmail())) {
+            throw new UsernameAlreadyExistsException("Email already exists");
         }
         if(image != null) {
             String avatar = imageService.uploadImage("avatars", image);
@@ -170,4 +175,14 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findByUsername(username);
     }
+
+//    public void joinRoom(Principal principal, Long id) {
+//        User user = findByUsername(principal.getName());
+//        user.setRoom(roomRepository.findById(id).orElseThrow(() -> new RuntimeException("Room not found")));
+//    }
+//
+//    public void joinRoom(Principal principal, String code) {
+//        User user = findByUsername(principal.getName());
+//        user.setRoom(roomRepository.findByCode(code).orElseThrow(() -> new RuntimeException("Room not found")));
+//    }
 }

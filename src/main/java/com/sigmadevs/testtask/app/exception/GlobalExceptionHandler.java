@@ -95,6 +95,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
         return errors;
     }
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(RuntimeException.class)
+//    public ApiError handleRuntime(RuntimeException e) {
+//        return new ApiError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+//
+//    }
 
 //    @ResponseBody
 //    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 user = userService.findByUsername(jwtUtil.getUsername(jwt));
             } catch (UserNotFoundException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("User not found");
+//                response.getWriter().write("User not found");
 //                response.setHeader("Set-Cookie", "accessToken=unauthorized;expires=Thu, 01 Jan 1970 00:00:01 GMT;");
                 filterChain.doFilter(request, response);
                 return;

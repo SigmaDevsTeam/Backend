@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +31,7 @@ public class QuestRestController {
     //TODO
     @PutMapping(value = "/quests", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    @ResponseStatus(HttpStatus.OK)
-    public QuestDTO updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
+    public ResponseEntity<QuestDTO> updateQuest(@RequestPart @Valid UpdateQuestDTO quest, @RequestPart(required = false) MultipartFile image, Principal principal) {
         return questService.updateQuest(quest,image,principal);
     }
 
@@ -48,8 +49,8 @@ public class QuestRestController {
 
     @DeleteMapping("/quests/{id}")
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeQuestById(@PathVariable("id") Long id, Principal principal) {
-        questService.removeQuestById(id,principal);
+    public ResponseEntity<String> removeQuestById(@PathVariable("id") Long id, Principal principal) {
+        return questService.removeQuestById(id,principal);
     }
 
 }

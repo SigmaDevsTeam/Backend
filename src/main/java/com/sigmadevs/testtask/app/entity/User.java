@@ -46,6 +46,10 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
 
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
     private Integer usersRated;
 
     private Float rating;

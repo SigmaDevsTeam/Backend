@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -49,7 +51,7 @@ public class QuestService {
     }
 
     @Transactional
-    public QuestDTO updateQuest(UpdateQuestDTO updateQuestDTO,MultipartFile image,Principal principal) {
+    public ResponseEntity<QuestDTO> updateQuest(UpdateQuestDTO updateQuestDTO,MultipartFile image,Principal principal) {
         log.info("Updating quest with ID: {}", updateQuestDTO.getId());
         Quest quest = questRepository.findById(updateQuestDTO.getId())
                 .orElseThrow(() -> {
@@ -67,18 +69,9 @@ public class QuestService {
             quest.setTimeLimit(updateQuestDTO.getTimeLimit());
 
             log.info("Quest with ID {} updated successfully", updateQuestDTO.getId());
-            return questMapper.toDTO(quest);
+            return ResponseEntity.ok(questMapper.toDTO(quest));
         }else {
-            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                    .getRequestAttributes())
-                    .getResponse();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            try {
-                response.getWriter().write("Forbidden");
-                return null;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
     }
 
@@ -100,22 +93,15 @@ public class QuestService {
         return questMapper.toDTO(quest);
     }
 
-    public void removeQuestById(long id, Principal principal) {
+    public ResponseEntity<String> removeQuestById(long id, Principal principal) {
         log.info("Attempting to delete quest with ID: {}", id);
         Quest quest = questRepository.findById(id).orElseThrow(() -> new QuestNotFoundException("Quest with Id " + id + " not found!"));
         if (quest.getUser().getUsername().equals(principal.getName())) {
             questRepository.deleteById(id);
             log.info("Quest with ID {} deleted successfully", id);
+            return ResponseEntity.ok("Quest with Id " + id + " deleted successfully");
         }else {
-            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes())
-                .getResponse();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            try {
-                response.getWriter().write("Forbidden");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+          return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
     }
 }

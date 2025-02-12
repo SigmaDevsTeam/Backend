@@ -1,14 +1,17 @@
 package com.sigmadevs.testtask.app.service;
 
+import com.sigmadevs.testtask.app.dto.CreateQuestDTO;
 import com.sigmadevs.testtask.app.dto.CreateTaskDTO;
 import com.sigmadevs.testtask.app.dto.TaskDTO;
 import com.sigmadevs.testtask.app.dto.UpdateTaskDTO;
+import com.sigmadevs.testtask.app.entity.Option;
 import com.sigmadevs.testtask.app.entity.Quest;
 import com.sigmadevs.testtask.app.entity.Task;
 import com.sigmadevs.testtask.app.entity.User;
 import com.sigmadevs.testtask.app.exception.QuestNotFoundException;
 import com.sigmadevs.testtask.app.exception.TaskNotFoundException;
 import com.sigmadevs.testtask.app.exception.UserNotFoundException;
+import com.sigmadevs.testtask.app.mapper.OptionMapper;
 import com.sigmadevs.testtask.app.mapper.TaskMapper;
 import com.sigmadevs.testtask.app.repository.QuestRepository;
 import com.sigmadevs.testtask.app.repository.TaskRepository;
@@ -18,6 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -38,8 +43,9 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final ImageService imageService;
     private final OptionService optionService;
+    private final OptionMapper optionMapper;
 
-    public TaskDTO createTask(CreateTaskDTO createTaskDTO, MultipartFile image,MultipartFile video,MultipartFile audio,Principal principal) {
+    public ResponseEntity<TaskDTO> createTask(CreateTaskDTO createTaskDTO, MultipartFile image,MultipartFile video,MultipartFile audio,Principal principal) {
         log.info("Creating task with title: {}", createTaskDTO.getTitle());
         User user1 = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
 
@@ -60,36 +66,31 @@ public class TaskService {
                 createTaskDTO.setAudio(uploadedAudio);
             }
             Task task = taskRepository.save(taskMapper.toEntity(createTaskDTO, quest));
-            optionService.createAllOptions(createTaskDTO.getOptions(),task);
-            log.info("Task created with ID: {}", task.getId());
-            return taskMapper.toDTO(task);
-        }else {
-            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                    .getRequestAttributes())
-                    .getResponse();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            try {
-                response.getWriter().write("Forbidden");
-                return null;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (task.getOptions()!=null){
+
+                optionService.createAllOptions(createTaskDTO.getOptions(),task);
             }
+            log.info("Task created with ID: {}", task.getId());
+            return ResponseEntity.ok(taskMapper.toDTO(task));
+        }else {
+           return ResponseEntity.status(403).body(null);
         }
     }
 
     @Transactional
-    public TaskDTO updateTask(UpdateTaskDTO updateTaskDTO, MultipartFile image,MultipartFile video,MultipartFile audio,Principal principal) {
-        log.info("Updating task with ID: {}", updateTaskDTO.getId());
-        Task task = taskRepository.findById(updateTaskDTO.getId())
+    public ResponseEntity<TaskDTO> updateTask(CreateTaskDTO updateTaskDTO, MultipartFile image, MultipartFile video, MultipartFile audio, Principal principal,Long id) {
+        log.info("Updating task with ID: {}", id);
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Task with ID {} not found!", updateTaskDTO.getId());
-                    return new TaskNotFoundException("Task with Id " + updateTaskDTO.getId() + " not found!");
+                    log.warn("Task with ID {} not found!", id);
+                    return new TaskNotFoundException("Task with Id " + id + " not found!");
                 });
         if(task.getQuest().getUser().getUsername().equals(principal.getName())) {
 
             task.setTitle(updateTaskDTO.getTitle()!=null?updateTaskDTO.getTitle():task.getTitle());
-            task.setAudio(updateTaskDTO.getAudio());
-            task.setVideo(updateTaskDTO.getVideo());
+            task.setAudio(updateTaskDTO.getAudio()!=null?updateTaskDTO.getAudio():task.getAudio());
+            task.setVideo(updateTaskDTO.getVideo()!=null?updateTaskDTO.getVideo():task.getVideo());
+            task.setImage(updateTaskDTO.getImage()!=null?updateTaskDTO.getImage():task.getImage());
             if (image!=null) {
                 String url = imageService.updateImage(task.getImage(), image);
                 task.setImage(url);
@@ -100,21 +101,26 @@ public class TaskService {
                 String url = imageService.updateImage(task.getAudio(), audio);
                 task.setAudio(url);
             }
-            task.setOpenAnswer(updateTaskDTO.getOpenAnswer());
+            if (updateTaskDTO.getOpenAnswer()!=null) {
 
-            log.info("Task with ID {} updated successfully", task.getId());
-            return taskMapper.toDTO(task);
-        }else {
-            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                    .getRequestAttributes())
-                    .getResponse();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            try {
-                response.getWriter().write("Forbidden");
-                return null;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                task.setOpenAnswer(updateTaskDTO.getOpenAnswer());
+                if(!task.getOptions().isEmpty()){
+                    task.getOptions().clear();
+                }
             }
+            if (updateTaskDTO.getOptions()!=null) {
+
+                List<Option> list = updateTaskDTO.getOptions().stream().map(e -> optionMapper.toEntity(e, task)).toList();
+                task.getOptions().clear();
+                task.getOptions().addAll(list);
+                if(task.getOpenAnswer()!=null) {
+                    task.setOpenAnswer(null);
+                }
+            }
+            log.info("Task with ID {} updated successfully", task.getId());
+            return ResponseEntity.ok(taskMapper.toDTO(task));
+        }else {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
 
     }
@@ -138,27 +144,17 @@ public class TaskService {
         return taskMapper.toDTO(task);
     }
 
-    public void removeTaskById(long id, Principal principal) {
+    public ResponseEntity<String> removeTaskById(long id, Principal principal) {
         log.info("Attempting to remove task with ID: {}", id);
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with Id " + id + " not found!"));
         if (task.getQuest().getUser().getUsername().equals(principal.getName())) {
             taskRepository.deleteById(id);
             log.info("Task with ID {} removed successfully", id);
+            return ResponseEntity.ok("Task with Id " + id + " removed successfully");
         } else {
-            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder
-                    .getRequestAttributes())
-                    .getResponse();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            try {
-                response.getWriter().write("Forbidden");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
-
-
     }
-
     public List<TaskDTO> getTasksById(Long id) {
         List<Task> task = taskRepository.findTasksByQuest_Id(id);
         return task.stream().map(taskMapper::toDTO).toList();
