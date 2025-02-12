@@ -47,6 +47,12 @@ public class QuestRestController {
         return questService.getQuestById(id);
     }
 
+    @GetMapping("/quests/user/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<QuestDTO> getQuestByUserId(@PathVariable("id") Long id) {
+        return questService.getQuestByUserId(id);
+    }
+
     @DeleteMapping("/quests/{id}")
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> removeQuestById(@PathVariable("id") Long id, Principal principal) {

@@ -55,7 +55,8 @@ public class SecurityConfig {
                         request.
                                 requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/avatars/**", "/logout", "/login/**", "/registration", "/static/**", "/api/**", "/oauth2/**").permitAll().
                                 requestMatchers(HttpMethod.GET,"/api/**").permitAll().
-                                requestMatchers("/api/**").authenticated().
+                                requestMatchers("/ws/**").permitAll().
+                        requestMatchers("/api/**").authenticated().
                                 requestMatchers("/admin/**").hasAuthority(Role.ADMIN.getAuthority()).
                                 anyRequest().authenticated()).
                 logout(e -> e

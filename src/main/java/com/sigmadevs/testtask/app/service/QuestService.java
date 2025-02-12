@@ -42,8 +42,11 @@ public class QuestService {
     public QuestDTO createQuest(CreateQuestDTO createQuestDTO, MultipartFile image,Principal principal) {
         log.info("Creating a new quest with title: {}", createQuestDTO.getTitle());
         User user1 = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UserNotFoundException(principal.getName()));
+        String imageUrl;
+        if (image!=null ){
 
-        String imageUrl = imageService.uploadImage("quest", image);
+             imageUrl = imageService.uploadImage("quest", image);
+        }else  imageUrl = null;
         createQuestDTO.setImage(imageUrl);
         Quest quest = questRepository.save(questMapper.toEntity(createQuestDTO, user1));
         log.info("Quest created successfully with ID: {}", quest.getId());
@@ -103,5 +106,12 @@ public class QuestService {
         }else {
           return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
+    }
+
+    public List<QuestDTO> getQuestByUserId(Long id) {
+        log.info("Fetching all quests");
+        List<Quest> quests = questRepository.findAllByUser_Id(id);
+        log.info("Retrieved {} quests", quests.size());
+        return questMapper.toDTOList(quests);
     }
 }
